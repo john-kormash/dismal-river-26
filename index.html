@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dismal River '26 — Boys Golf Trip</title>
+<meta name="description" content="Denver to the Nebraska Sandhills. August 27–30, 2026. Two rounds a day at Dismal River Club — Doak's Red and Nicklaus's White." />
+<meta name="theme-color" content="#070E0B" />
+<meta name="color-scheme" content="dark" />
+
+<meta property="og:title" content="Dismal River '26 — Boys Golf Trip" />
+<meta property="og:description" content="Denver → Ogallala → the Sandhills. Aug 27–30, 2026. Red &amp; White at Dismal River Club." />
+<meta property="og:type" content="website" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23070E0B'/><circle cx='50' cy='50' r='24' fill='%23EAF2ED'/><circle cx='42' cy='42' r='3' fill='%23E3B84F'/><circle cx='54' cy='40' r='3' fill='%23E3B84F'/><circle cx='60' cy='52' r='3' fill='%23E3B84F'/><circle cx='46' cy='56' r='3' fill='%23E3B84F'/><circle cx='56' cy='62' r='3' fill='%23E3B84F'/></svg>" />
+
+<style>
+  :root{
+    --bg:#070E0B;
+    --bg-2:#0A1611;
+    --bg-3:#0D1D16;
+    --surface:rgba(255,255,255,.035);
+    --surface-2:rgba(255,255,255,.06);
+    --line:rgba(255,255,255,.085);
+    --line-2:rgba(255,255,255,.17);
+    --text:#EAF2ED;
+    --muted:#8CA398;
+    --gold:#E3B84F;
+    --gold-2:#C9A24B;
+    --green:#3FCF8E;
+    --red:#E4574B;
+    --radius:16px;
+    --serif:"Instrument Serif", Georgia, "Times New Roman", serif;
+    --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono:ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --glow:0 0 0 1px rgba(255,255,255,.06), 0 20px 60px -24px rgba(0,0,0,.9);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:78px}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  a{color:inherit}
+  ::selection{background:var(--gold); color:#0A1611}
+
+  /* film grain over everything */
+  body::after{
+    content:""; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{width:min(1160px, 92vw); margin-inline:auto}
+
+  /* ---------- SCROLL PROGRESS ---------- */
+  .progress{
+    position:fixed; top:0; left:0; height:2px; width:0; z-index:1000;
+    background:linear-gradient(90deg, var(--green), var(--gold));
+    box-shadow:0 0 12px rgba(227,184,79,.6);
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:900;
+    background:rgba(7,14,11,.72); backdrop-filter:blur(16px) saturate(140%);
+    border-bottom:1px solid var(--line); transition:border-color .3s;
+  }
+  .nav.scrolled{border-bottom-color:var(--line-2); background:rgba(7,14,11,.92)}
+  .nav-inner{display:flex; align-items:center; gap:24px; height:64px}
+  .brand{
+    display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:600;
+    letter-spacing:.16em; font-size:12px; text-transform:uppercase; white-space:nowrap;
+  }
+  .brand-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none;
+    box-shadow:0 0 0 0 rgba(227,184,79,.7); animation:pulse 2.6s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(227,184,79,.6)}
+    70%{box-shadow:0 0 0 9px rgba(227,184,79,0)}
+    100%{box-shadow:0 0 0 0 rgba(227,184,79,0)}
+  }
+  .nav-links{display:flex; gap:2px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{
+    position:relative; color:var(--muted); text-decoration:none; font-size:13px; font-weight:500;
+    padding:8px 13px; border-radius:99px; white-space:nowrap; transition:.2s;
+  }
+  .nav-links a:hover{color:var(--text); background:var(--surface-2)}
+  .nav-links a.active{color:var(--gold)}
+  .nav-links a.active::after{
+    content:""; position:absolute; left:13px; right:13px; bottom:2px; height:1px;
+    background:var(--gold); box-shadow:0 0 8px var(--gold);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative; overflow:hidden; padding:110px 0 84px; isolation:isolate}
+  .aurora{position:absolute; inset:-20% -10%; z-index:-2; filter:blur(90px); opacity:.5}
+  .blob{position:absolute; border-radius:50%}
+  .blob.a{width:52vw; height:52vw; left:-8%; top:-14%; background:radial-gradient(circle, rgba(20,120,80,.85) 0%, transparent 70%); animation:drift1 22s ease-in-out infinite}
+  .blob.b{width:44vw; height:44vw; right:-6%; top:6%; background:radial-gradient(circle, rgba(63,207,142,.42) 0%, transparent 70%); animation:drift2 27s ease-in-out infinite}
+  .blob.c{width:38vw; height:38vw; left:36%; bottom:-22%; background:radial-gradient(circle, rgba(227,184,79,.34) 0%, transparent 70%); animation:drift3 31s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(7%,6%) scale(1.14)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1.06)}50%{transform:translate(-8%,9%) scale(.92)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-6%,-11%) scale(1.18)}}
+
+  .contour{position:absolute; inset:0; z-index:-1; opacity:.2; pointer-events:none}
+  .contour path{
+    stroke:var(--gold); fill:none; stroke-width:1;
+    stroke-dasharray:1400; stroke-dashoffset:1400;
+    animation:draw 3s cubic-bezier(.3,.9,.3,1) forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  .hero::before{
+    content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(180deg, transparent 55%, var(--bg) 100%);
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px; font-size:11px; font-weight:600;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--gold);
+    border:1px solid rgba(227,184,79,.3); border-radius:99px; padding:7px 16px;
+    background:rgba(227,184,79,.06);
+  }
+  h1{
+    font-family:var(--serif); font-weight:400; margin:26px 0 0;
+    font-size:clamp(46px, 12vw, 138px); line-height:.9; letter-spacing:-.025em;
+    background:linear-gradient(175deg, #FFFFFF 12%, #A9C9B8 92%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  h1 em{
+    font-style:italic;
+    background:linear-gradient(175deg, var(--gold) 10%, #8A6E2C 96%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero-sub{max-width:54ch; margin:24px 0 0; color:var(--muted); font-size:clamp(15px,1.6vw,18px)}
+  .hero-cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:36px}
+  .btn{
+    position:relative; display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    padding:14px 24px; border-radius:99px; font-size:14px; font-weight:600;
+    border:1px solid transparent; cursor:pointer; transition:.22s cubic-bezier(.2,.8,.2,1); overflow:hidden;
+  }
+  .btn-primary{background:var(--gold); color:#0A1611; box-shadow:0 8px 30px -8px rgba(227,184,79,.55)}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 40px -8px rgba(227,184,79,.75)}
+  .btn-ghost{border-color:var(--line-2); color:var(--text); background:var(--surface)}
+  .btn-ghost:hover{background:var(--surface-2); border-color:var(--gold); transform:translateY(-2px)}
+
+  .countdown{display:flex; gap:10px; flex-wrap:wrap; margin-top:56px}
+  .cd-cell{
+    position:relative; background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; padding:16px 8px; min-width:88px; flex:1 1 88px; max-width:126px; text-align:center;
+    backdrop-filter:blur(8px); overflow:hidden;
+  }
+  .cd-cell::before{
+    content:""; position:absolute; inset:0 0 auto; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(227,184,79,.7), transparent);
+  }
+  .cd-num{
+    font-family:var(--serif); font-size:44px; line-height:1; color:var(--text);
+    font-variant-numeric:tabular-nums; text-shadow:0 0 26px rgba(63,207,142,.28);
+  }
+  .cd-lab{font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-top:8px}
+  .cd-note{margin-top:16px; font-size:13px; color:var(--gold); letter-spacing:.05em}
+
+  /* ---------- TICKER ---------- */
+  .ticker{
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    background:linear-gradient(90deg, rgba(63,207,142,.05), rgba(227,184,79,.05));
+    overflow:hidden; padding:13px 0; user-select:none;
+  }
+  .ticker-track{display:flex; width:max-content; animation:slide 34s linear infinite}
+  .ticker span{
+    font-size:11.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted);
+    padding:0 26px; white-space:nowrap; display:flex; align-items:center; gap:26px;
+  }
+  .ticker span::after{content:"◆"; color:var(--gold); font-size:8px; letter-spacing:0}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- STATS ---------- */
+  .stats{background:var(--bg-2); border-bottom:1px solid var(--line)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))}
+  .stat{padding:32px 22px; border-right:1px solid var(--line); position:relative; transition:.3s}
+  .stat:last-child{border-right:none}
+  .stat:hover{background:var(--surface)}
+  .stat:hover .stat-num{color:var(--gold)}
+  .stat-num{font-family:var(--serif); font-size:44px; line-height:1; transition:.3s; font-variant-numeric:tabular-nums}
+  .stat-lab{font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-top:8px}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:100px 0; position:relative}
+  .alt{background:var(--bg-2); border-block:1px solid var(--line)}
+  .sec-head{margin-bottom:48px; max-width:64ch}
+  .kicker{
+    font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--green); display:flex; align-items:center; gap:12px;
+  }
+  .kicker::before{content:""; width:28px; height:1px; background:var(--gold); box-shadow:0 0 8px var(--gold)}
+  h2{font-family:var(--serif); font-weight:400; font-size:clamp(36px,5.4vw,58px); line-height:1.02; margin:16px 0 0; letter-spacing:-.015em}
+  .sec-head p{color:var(--muted); margin:16px 0 0}
+
+  .card{
+    position:relative; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); overflow:hidden; transition:.3s cubic-bezier(.2,.8,.2,1);
+  }
+  .card::before{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%), rgba(227,184,79,.13), transparent 42%);
+    opacity:0; transition:opacity .35s;
+  }
+  .card:hover::before{opacity:1}
+  .card:hover{border-color:var(--line-2); transform:translateY(-3px); box-shadow:var(--glow)}
+
+  /* ---------- ITINERARY ---------- */
+  .timeline{display:flex; flex-direction:column; gap:16px}
+  .day{display:grid; grid-template-columns:126px 1fr}
+  .day::after{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+    background:linear-gradient(180deg, var(--green), var(--gold)); opacity:0; transition:.3s;
+  }
+  .day:hover::after{opacity:1}
+  .day-date{
+    background:linear-gradient(160deg, var(--bg-3), var(--bg)); border-right:1px solid var(--line);
+    padding:26px 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  }
+  .day-dow{font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold)}
+  .day-num{font-family:var(--serif); font-size:52px; line-height:1; margin-top:2px}
+  .day-mon{font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+  .day-body{padding:26px 30px}
+  .day-title{font-family:var(--serif); font-weight:400; font-size:30px; line-height:1.1; margin:0}
+  .day-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:15px}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
+    padding:6px 12px; border-radius:99px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line);
+  }
+  .chip.drive{background:rgba(227,184,79,.1); color:var(--gold); border-color:rgba(227,184,79,.28)}
+  .chip.golf{background:rgba(63,207,142,.1); color:var(--green); border-color:rgba(63,207,142,.28)}
+  .day-detail{margin-top:16px; color:var(--muted); font-size:14.5px}
+  .day-detail strong{color:var(--text); font-weight:600}
+  .tee{margin-top:18px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(min(238px,100%),1fr))}
+  .tee-slot{
+    display:flex; align-items:center; gap:13px; padding:13px 15px; border-radius:12px;
+    background:var(--bg); border:1px solid var(--line); transition:.25s;
+  }
+  .tee-slot:hover{border-color:var(--line-2); background:var(--bg-3)}
+  .tee-time{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text); white-space:nowrap}
+  .tee-course{font-size:12.5px; color:var(--muted); line-height:1.35}
+  .tee-course b{display:block; color:var(--text); font-size:13.5px; font-weight:600}
+  .swatch{width:8px; height:36px; border-radius:99px; flex:none}
+  .swatch.red{background:linear-gradient(180deg,#E4574B,#8C2A22); box-shadow:0 0 14px rgba(228,87,75,.5)}
+  .swatch.white{background:linear-gradient(180deg,#F2EEE3,#9E9887); box-shadow:0 0 14px rgba(242,238,227,.3)}
+
+  /* ---------- MAP ---------- */
+  .map-layout{display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start}
+  #route-map{
+    height:500px; border-radius:var(--radius); border:1px solid var(--line);
+    background:var(--bg-3); z-index:1; box-shadow:var(--glow);
+  }
+  .leaflet-container{font-family:var(--sans); background:#0A1611}
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{
+    background:var(--bg-3); color:var(--text); border:1px solid var(--line-2); box-shadow:var(--glow);
+  }
+  .leaflet-popup-content-wrapper{border-radius:10px}
+  .leaflet-popup-content{margin:12px 15px; font-size:13px}
+  .leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+  .leaflet-control-attribution{background:rgba(7,14,11,.8)!important; color:var(--muted)!important}
+  .leaflet-control-attribution a{color:var(--green)!important}
+  .leaflet-bar a{background:var(--bg-3)!important; color:var(--text)!important; border-color:var(--line)!important}
+  .leaflet-bar a:hover{background:var(--bg-2)!important}
+  .pin{
+    display:grid; place-items:center; width:32px; height:32px; border-radius:50% 50% 50% 4px;
+    transform:rotate(-45deg); background:var(--bg-3); color:var(--text);
+    border:2px solid var(--green); font-weight:700; font-size:13px;
+    box-shadow:0 0 16px rgba(63,207,142,.55);
+  }
+  .pin span{transform:rotate(45deg)}
+  .pin.gold{background:var(--gold); color:#0A1611; border-color:#fff3d4; box-shadow:0 0 20px rgba(227,184,79,.8)}
+  .legs{display:flex; flex-direction:column; gap:12px}
+  .leg{padding:17px 19px}
+  .leg-top{display:flex; align-items:baseline; justify-content:space-between; gap:12px}
+  .leg-name{font-weight:600; font-size:14.5px}
+  .leg-time{font-family:var(--mono); font-size:13px; color:var(--gold); font-weight:600; white-space:nowrap}
+  .leg-sub{font-size:13px; color:var(--muted); margin-top:5px}
+  .leg a{
+    display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-size:12.5px;
+    font-weight:600; color:var(--green); text-decoration:none; transition:.2s;
+  }
+  .leg a:hover{gap:10px; color:var(--gold)}
+  .map-fallback{
+    display:none; height:500px; border-radius:var(--radius); border:1px dashed var(--line-2);
+    background:var(--bg-2); place-items:center; text-align:center; padding:30px; color:var(--muted);
+  }
+
+  /* ---------- COURSES ---------- */
+  .courses{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:20px}
+  .course{display:flex; flex-direction:column}
+  .course-top{padding:26px; position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
+  .course-top::after{
+    content:""; position:absolute; inset:0; opacity:.9;
+    background:radial-gradient(120% 100% at 78% 0%, rgba(255,255,255,.14), transparent 60%);
+    pointer-events:none;
+  }
+  .course-top.red{background:linear-gradient(150deg,#7A2620,#2A0F0C)}
+  .course-top.white{background:linear-gradient(150deg,#41504A,#141E1A)}
+  .course-top.muni{background:linear-gradient(150deg,#155E43,#0C1C15)}
+  .course-tag{position:relative; z-index:1; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.6)}
+  .course-name{position:relative; z-index:1; font-family:var(--serif); font-weight:400; font-size:34px; line-height:1.02; margin:8px 0 0}
+  .course-by{position:relative; z-index:1; font-size:13px; color:rgba(255,255,255,.62); margin:8px 0 0}
+  .course-body{padding:22px 26px 26px; flex:1; display:flex; flex-direction:column}
+  .course-specs{display:flex; gap:26px; padding-bottom:18px; border-bottom:1px solid var(--line)}
+  .spec-num{font-family:var(--serif); font-size:27px; line-height:1; color:var(--gold)}
+  .spec-lab{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:4px}
+  .course-note{font-size:14px; color:var(--muted); margin:18px 0 20px; flex:1}
+
+  /* tee table */
+  .tees{width:100%; border-collapse:collapse; margin:0 0 22px}
+  .tees caption{
+    text-align:left; font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--muted); padding-bottom:9px;
+  }
+  .tees th{
+    font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+    font-weight:600; text-align:right; padding:0 0 8px; border-bottom:1px solid var(--line);
+  }
+  .tees th:first-child{text-align:left}
+  .tees td{
+    font-family:var(--mono); font-size:13px; text-align:right; padding:9px 0;
+    border-bottom:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums;
+  }
+  .tees td:first-child{
+    text-align:left; font-family:var(--sans); font-size:13px; font-weight:600; color:var(--text);
+    white-space:nowrap;
+  }
+  .tees tr:last-child td{border-bottom:none}
+  .tees tr.play td{color:var(--text)}
+  .tees tr.play td:nth-child(3),.tees tr.play td:nth-child(4){color:var(--gold)}
+  .tee-dot{
+    display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:9px;
+    vertical-align:middle; border:1px solid rgba(255,255,255,.25);
+  }
+  .tee-dot.blue{background:#4A7FD4}
+  .tee-dot.white{background:#EFEBE0}
+  .tee-dot.back{background:#3A4E45}
+  .tee-dot.red{background:#C8635C}
+  .tee-dot.front{background:#C8635C}
+  .tee-src{font-size:11px; color:var(--muted); margin:-12px 0 20px; opacity:.8}
+  .course-links{display:flex; flex-wrap:wrap; gap:20px}
+  .course-link{
+    display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+    color:var(--text); text-decoration:none; transition:.2s;
+  }
+  .course-link:hover{gap:12px; color:var(--gold)}
+
+  /* ---------- STAY ---------- */
+  .stays{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr)); gap:20px}
+  .stay{padding:28px}
+  .stay-h{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:12px 14px}
+  .stay-name{font-family:var(--serif); font-weight:400; font-size:28px; line-height:1.08; margin:0}
+  .stay-when{
+    font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--green);
+    font-weight:700; white-space:nowrap; padding:6px 11px; border-radius:99px;
+    background:rgba(63,207,142,.1); border:1px solid rgba(63,207,142,.26);
+  }
+  .stay-addr{font-size:13.5px; color:var(--muted); margin-top:12px}
+  .rooms{display:grid; gap:10px; margin-top:20px}
+  .room{padding:15px 17px; border-radius:12px; background:var(--bg); border:1px solid var(--line); transition:.25s}
+  .room:hover{border-color:rgba(227,184,79,.35)}
+  .room b{font-size:14px}
+  .room p{margin:5px 0 0; font-size:13px; color:var(--muted)}
+  .amenity-head{
+    font-size:10px; letter-spacing:.19em; text-transform:uppercase; color:var(--muted);
+    margin:24px 0 12px; display:flex; align-items:center; gap:11px;
+  }
+  .amenity-head::after{content:""; flex:1; height:1px; background:var(--line)}
+  .amenities{display:flex; flex-wrap:wrap; gap:8px}
+  .amenity{
+    display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:500;
+    padding:8px 14px; border-radius:99px; color:var(--text);
+    background:rgba(63,207,142,.07); border:1px solid rgba(63,207,142,.22); transition:.22s;
+  }
+  .amenity:hover{background:rgba(63,207,142,.14); border-color:rgba(63,207,142,.45); transform:translateY(-1px)}
+  .stay-links{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px}
+  .mini{
+    font-size:12.5px; font-weight:600; text-decoration:none; padding:9px 16px; border-radius:99px;
+    border:1px solid var(--line); color:var(--text); background:var(--surface); transition:.22s;
+  }
+  .mini:hover{background:var(--gold); color:#0A1611; border-color:var(--gold); transform:translateY(-1px)}
+
+  /* ---------- ROSTER ---------- */
+  .players{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(206px,100%),1fr)); gap:12px}
+  .player{
+    display:flex; align-items:center; gap:14px; padding:15px 17px; background:var(--surface);
+    border:1px solid var(--line); border-radius:14px; transition:.25s;
+  }
+  .player:hover{transform:translateY(-2px); border-color:rgba(227,184,79,.4)}
+  .avatar{
+    width:42px; height:42px; border-radius:50%; flex:none; display:grid; place-items:center;
+    font-weight:600; font-size:14px; letter-spacing:.02em;
+    background:rgba(227,184,79,.1); color:var(--gold); border:1px solid rgba(227,184,79,.3);
+  }
+  .player-name{font-weight:600; font-size:14.5px; line-height:1.2}
+  .player-no{font-size:11px; margin-top:3px; color:var(--muted); font-family:var(--mono)}
+
+  /* ---------- INFO ---------- */
+  .panel{padding:30px 32px}
+  .panel h3{font-family:var(--serif); font-weight:400; font-size:26px; margin:0 0 6px}
+  .panel .hint{font-size:13px; color:var(--muted); margin:0 0 20px}
+  .notes{padding-left:20px; margin:0; columns:2; column-gap:44px}
+  .notes li{font-size:14.5px; color:var(--muted); margin-bottom:15px; break-inside:avoid}
+  .notes li::marker{color:var(--gold)}
+  .notes li b{color:var(--text)}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--bg-2); border-top:1px solid var(--line); color:var(--muted);
+    padding:64px 0 44px; position:relative; overflow:hidden;
+  }
+  footer::before{
+    content:""; position:absolute; top:-50%; left:50%; transform:translateX(-50%);
+    width:70vw; height:60vh; background:radial-gradient(circle, rgba(63,207,142,.09), transparent 68%); pointer-events:none;
+  }
+  .foot-inner{position:relative; display:flex; flex-wrap:wrap; gap:22px; justify-content:space-between; align-items:center}
+  .foot-brand{font-family:var(--serif); font-size:34px; color:var(--text)}
+  .foot-links{display:flex; gap:20px; flex-wrap:wrap}
+  .foot-links a{font-size:13px; text-decoration:none; transition:.2s}
+  .foot-links a:hover{color:var(--gold)}
+  .foot-note{position:relative; font-size:12px; margin-top:30px; padding-top:24px; border-top:1px solid var(--line)}
+
+  /* ---------- REVEAL ---------- */
+  .rv{opacity:0; transform:translateY(24px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1)}
+  .rv.in{opacity:1; transform:none}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:920px){
+    .map-layout{grid-template-columns:1fr}
+    #route-map,.map-fallback{height:400px}
+    .notes{columns:1}
+  }
+  @media (max-width:640px){
+    section{padding:68px 0}
+    .hero{padding:70px 0 60px}
+    .day{grid-template-columns:1fr}
+    .day-date{flex-direction:row; gap:10px; padding:14px 18px; justify-content:flex-start; border-right:none; border-bottom:1px solid var(--line)}
+    .day-num{font-size:28px}
+    .day-body{padding:22px}
+    .stat{border-right:none; border-bottom:1px solid var(--line); padding:24px 20px}
+    .cd-cell{min-width:0; padding:13px 4px}
+    .cd-num{font-size:32px}
+  }
+  @media (max-width:400px){
+    .wrap{width:94vw}
+    .day-body,.panel,.stay{padding:20px 18px}
+    .course-body{padding:20px 18px 22px}
+    .course-top{padding:22px 18px}
+    .tees th{font-size:9px; letter-spacing:.08em}
+    .tees td{font-size:12px}
+    .tees td:first-child{font-size:12.5px}
+    .tee-dot{margin-right:7px}
+    .amenity,.chip{font-size:11.5px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important}
+    .rv{opacity:1; transform:none}
+    .contour path{stroke-dashoffset:0}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><span class="brand-dot"></span> Dismal River '26</a>
+    <div class="nav-links">
+      <a href="#itinerary">Itinerary</a>
+      <a href="#map">The Route</a>
+      <a href="#courses">Courses</a>
+      <a href="#stay">Lodging</a>
+      <a href="#roster">The Guys</a>
+      <a href="#info">Before You Go</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="aurora" aria-hidden="true">
+    <div class="blob a"></div>
+    <div class="blob b"></div>
+    <div class="blob c"></div>
+  </div>
+  <svg class="contour" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-50,470 C180,400 320,500 520,440 C720,380 900,470 1250,400" style="animation-delay:.05s"/>
+    <path d="M-50,505 C180,435 330,535 530,475 C730,415 910,505 1250,435" style="animation-delay:.2s"/>
+    <path d="M-50,540 C180,470 340,570 540,510 C740,450 920,540 1250,470" style="animation-delay:.35s"/>
+    <path d="M-50,575 C180,505 350,605 550,545 C750,485 930,575 1250,505" style="animation-delay:.5s"/>
+    <path d="M-50,300 C220,250 380,340 600,290 C820,240 1000,320 1250,270" style="animation-delay:.65s"/>
+    <path d="M-50,335 C220,285 390,375 610,325 C830,275 1010,355 1250,305" style="animation-delay:.8s"/>
+    <path d="M-50,150 C240,110 420,190 640,150 C860,110 1040,175 1250,140" style="animation-delay:.95s"/>
+    <path d="M-50,185 C240,145 430,225 650,185 C870,145 1050,210 1250,175" style="animation-delay:1.1s"/>
+  </svg>
+
+  <div class="wrap">
+    <span class="eyebrow">Aug 27 – 30, 2026 · Nebraska Sandhills</span>
+    <h1>Dismal River<br /><em>Boys Trip</em></h1>
+    <p class="hero-sub">
+      Eight guys, five hours of two-lane blacktop, and thirty-six holes a day on the best
+      sand golf between Denver and the Missouri River. Doak's Red and Nicklaus's White,
+      back to back.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#itinerary">See the itinerary →</a>
+      <a class="btn btn-ghost" href="https://dismalriver.com/" target="_blank" rel="noopener">Dismal River Club ↗</a>
+    </div>
+
+    <div class="countdown" id="countdown" aria-live="polite">
+      <div class="cd-cell"><div class="cd-num" id="cd-d">—</div><div class="cd-lab">Days</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cd-h">—</div><div class="cd-lab">Hours</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cd-m">—</div><div class="cd-lab">Minutes</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cd-s">—</div><div class="cd-lab">Seconds</div></div>
+    </div>
+    <p class="cd-note" id="cd-note">until we point the cars east</p>
+  </div>
+</header>
+
+<!-- ================= TICKER ================= -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<!-- ================= STATS ================= -->
+<div class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-num" data-count="8">0</div><div class="stat-lab">Golfers</div></div>
+      <div class="stat"><div class="stat-num" data-count="4">0</div><div class="stat-lab">Days</div></div>
+      <div class="stat"><div class="stat-num" data-count="4">0</div><div class="stat-lab">Rounds at Dismal</div></div>
+      <div class="stat"><div class="stat-num" data-count="2">0</div><div class="stat-lab">Championship Courses</div></div>
+      <div class="stat"><div class="stat-num" data-count="580" data-prefix="~">0</div><div class="stat-lab">Miles Round Trip</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ITINERARY ================= -->
+<section id="itinerary">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">The Plan</div>
+      <h2>Four days, east and back</h2>
+      <p>Out of Denver Thursday, two full days of golf in the Sandhills, home Sunday. Drive times are door to door and assume no stops.</p>
+    </div>
+
+    <div class="timeline">
+
+      <article class="day card rv">
+        <div class="day-date">
+          <div class="day-dow">Thu</div>
+          <div class="day-num">27</div>
+          <div class="day-mon">August</div>
+        </div>
+        <div class="day-body">
+          <h3 class="day-title">Denver → Ogallala</h3>
+          <div class="day-meta">
+            <span class="chip drive">🚗 3 hr drive</span>
+            <span class="chip">🛏 Hampton Inn, Ogallala</span>
+            <span class="chip golf">⛳ Optional 18</span>
+          </div>
+          <p class="day-detail">
+            Travel day. Straight shot up I-76 to I-80. Whether we get golf in
+            <strong>depends entirely on when you roll in</strong> —
+            <strong>Crandall Creek</strong> is a public track about two miles east of the hotel,
+            so an afternoon or twilight loop is easy if the timing works.
+          </p>
+        </div>
+      </article>
+
+      <article class="day card rv">
+        <div class="day-date">
+          <div class="day-dow">Fri</div>
+          <div class="day-num">28</div>
+          <div class="day-mon">August</div>
+        </div>
+        <div class="day-body">
+          <h3 class="day-title">Ogallala → Dismal River</h3>
+          <div class="day-meta">
+            <span class="chip drive">🚗 1 hr 45 min drive</span>
+            <span class="chip">🛏 Dismal River Club</span>
+            <span class="chip golf">⛳ 36 holes</span>
+          </div>
+          <p class="day-detail">
+            Early breakfast and north into the dunes. Two groups, ten minutes apart, both rounds.
+            <strong>Red in the morning, White in the afternoon.</strong>
+          </p>
+          <div class="tee">
+            <div class="tee-slot">
+              <div class="swatch red"></div>
+              <div><div class="tee-time">8:30 &amp; 8:40 AM</div><div class="tee-course"><b>Red Course</b>Tom Doak</div></div>
+            </div>
+            <div class="tee-slot">
+              <div class="swatch white"></div>
+              <div><div class="tee-time">2:00 &amp; 2:10 PM</div><div class="tee-course"><b>White Course</b>Jack Nicklaus</div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="day card rv">
+        <div class="day-date">
+          <div class="day-dow">Sat</div>
+          <div class="day-num">29</div>
+          <div class="day-mon">August</div>
+        </div>
+        <div class="day-body">
+          <h3 class="day-title">Dismal River — the full day</h3>
+          <div class="day-meta">
+            <span class="chip">🚗 No driving</span>
+            <span class="chip">🛏 Dismal River Club</span>
+            <span class="chip golf">⛳ 36 holes</span>
+          </div>
+          <p class="day-detail">
+            Same rhythm, courses flipped. <strong>White in the morning, Red in the afternoon.</strong>
+            Nothing to do but play golf and settle the bets — hot tub and card room are right there
+            when the legs give out.
+          </p>
+          <div class="tee">
+            <div class="tee-slot">
+              <div class="swatch white"></div>
+              <div><div class="tee-time">8:30 &amp; 8:40 AM</div><div class="tee-course"><b>White Course</b>Jack Nicklaus</div></div>
+            </div>
+            <div class="tee-slot">
+              <div class="swatch red"></div>
+              <div><div class="tee-time">2:00 &amp; 2:10 PM</div><div class="tee-course"><b>Red Course</b>Tom Doak</div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="day card rv">
+        <div class="day-date">
+          <div class="day-dow">Sun</div>
+          <div class="day-num">30</div>
+          <div class="day-mon">August</div>
+        </div>
+        <div class="day-body">
+          <h3 class="day-title">Dismal River → Denver</h3>
+          <div class="day-meta">
+            <span class="chip drive">🚗 5 hr drive</span>
+            <span class="chip">🛏 Home</span>
+          </div>
+          <p class="day-detail">
+            The long one. Roughly <strong>five hours</strong> back to the Front Range —
+            leave early enough to beat the Sunday I-76 crawl.
+          </p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= MAP ================= -->
+<section id="map" class="alt">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">The Route</div>
+      <h2>Denver to the dunes</h2>
+      <p>Three stops, one loop. Tap a marker on the map or grab turn-by-turn directions for any leg.</p>
+    </div>
+
+    <div class="map-layout rv">
+      <div>
+        <div id="route-map"></div>
+        <div class="map-fallback" id="map-fallback">
+          <div>
+            <strong>Map unavailable offline.</strong><br />
+            Denver, CO → Ogallala, NE → Dismal River Club (Mullen, NE) → Denver, CO
+          </div>
+        </div>
+      </div>
+
+      <div class="legs">
+        <div class="card leg">
+          <div class="leg-top"><span class="leg-name">1 · Denver → Ogallala, NE</span><span class="leg-time">3:00</span></div>
+          <div class="leg-sub">~185 mi via I-76 E and I-80 E. Overnight at the Hampton Inn.</div>
+          <a href="https://www.google.com/maps/dir/?api=1&origin=Denver,+CO&destination=502+Oregon+Trail+Dr,+Ogallala,+NE+69153" target="_blank" rel="noopener">Directions ↗</a>
+        </div>
+        <div class="card leg">
+          <div class="leg-top"><span class="leg-name">2 · Ogallala → Dismal River</span><span class="leg-time">1:45</span></div>
+          <div class="leg-sub">~95 mi north into the Sandhills. Fill up before you leave town.</div>
+          <a href="https://www.google.com/maps/dir/?api=1&origin=502+Oregon+Trail+Dr,+Ogallala,+NE+69153&destination=83040+Dismal+River+Trail,+Mullen,+NE+69152" target="_blank" rel="noopener">Directions ↗</a>
+        </div>
+        <div class="card leg">
+          <div class="leg-top"><span class="leg-name">3 · Dismal River → Denver</span><span class="leg-time">5:00</span></div>
+          <div class="leg-sub">~300 mi straight home Sunday morning.</div>
+          <a href="https://www.google.com/maps/dir/?api=1&origin=83040+Dismal+River+Trail,+Mullen,+NE+69152&destination=Denver,+CO" target="_blank" rel="noopener">Directions ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COURSES ================= -->
+<section id="courses">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">The Golf</div>
+      <h2>Two architects, one sand ridge</h2>
+      <p>Dismal River is the rare club with a Nicklaus and a Doak sharing a property. We play both, twice, in opposite order.</p>
+    </div>
+
+    <div class="courses">
+      <article class="course card rv">
+        <div class="course-top red">
+          <div class="course-tag">Dismal River Club</div>
+          <h3 class="course-name">Red Course</h3>
+          <div class="course-by">Tom Doak · opened 2013</div>
+        </div>
+        <div class="course-body">
+          <div class="course-specs">
+            <div><div class="spec-num">71</div><div class="spec-lab">Par</div></div>
+            <div><div class="spec-num">6,994</div><div class="spec-lab">Tips</div></div>
+          </div>
+          <p class="course-note">
+            Doak let the dunes dictate everything — greens tucked into natural bowls, fairways
+            that sprawl where the land sprawls. The one everyone talks about.
+          </p>
+          <table class="tees">
+            <caption>Tees · rating / slope</caption>
+            <tr><th>Tee</th><th>Yards</th><th>Rating</th><th>Slope</th></tr>
+            <tr class="play"><td><span class="tee-dot blue"></span>Blue</td><td>6,994</td><td>73.5</td><td>135</td></tr>
+            <tr class="play"><td><span class="tee-dot white"></span>White</td><td>6,252</td><td>69.9</td><td>128</td></tr>
+            <tr><td><span class="tee-dot red"></span>Red</td><td>4,838</td><td>63.7</td><td>116</td></tr>
+          </table>
+          <p class="tee-src">Yardages from the club scorecard · ratings &amp; slope via the Nebraska Golf Association</p>
+          <div class="course-links">
+            <a class="course-link" href="https://dismalriver.com/golf/" target="_blank" rel="noopener">Course details ↗</a>
+            <a class="course-link" href="https://dismalriver.com/wp-content/uploads/2026/03/Dismal-River-Club-Red-Scorecard.pdf" target="_blank" rel="noopener">Scorecard PDF ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="course card rv">
+        <div class="course-top white">
+          <div class="course-tag">Dismal River Club</div>
+          <h3 class="course-name">White Course</h3>
+          <div class="course-by">Jack Nicklaus · opened 2006</div>
+        </div>
+        <div class="course-body">
+          <div class="course-specs">
+            <div><div class="spec-num">72</div><div class="spec-lab">Par</div></div>
+            <div><div class="spec-num">7,398</div><div class="spec-lab">Tips</div></div>
+          </div>
+          <p class="course-note">
+            The original. Elevated tees, big carries, and panoramic looks across the Sandhills.
+            Longer and more demanding off the tee than its neighbor.
+          </p>
+          <table class="tees">
+            <caption>Tees · rating / slope</caption>
+            <tr><th>Tee</th><th>Yards</th><th>Rating</th><th>Slope</th></tr>
+            <tr class="play"><td><span class="tee-dot back"></span>Back</td><td>7,398</td><td>75.6</td><td>146</td></tr>
+            <tr class="play"><td><span class="tee-dot white"></span>Middle</td><td>6,530</td><td>71.6</td><td>139</td></tr>
+            <tr><td><span class="tee-dot front"></span>Forward</td><td>5,058</td><td>65.3</td><td>124</td></tr>
+          </table>
+          <p class="tee-src">Card has no blue/white sets — tees are Back, Middle, Forward. Ratings via the Nebraska Golf Association.</p>
+          <div class="course-links">
+            <a class="course-link" href="https://dismalriver.com/golf/" target="_blank" rel="noopener">Course details ↗</a>
+            <a class="course-link" href="https://dismalriver.com/wp-content/uploads/2026/03/Dismal-River-Club-White-Scorecard.pdf" target="_blank" rel="noopener">Scorecard PDF ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="course card rv">
+        <div class="course-top muni">
+          <div class="course-tag">Ogallala · Thursday, if timing works</div>
+          <h3 class="course-name">Crandall Creek</h3>
+          <div class="course-by">Martin Johnson Jr. · opened 1964</div>
+        </div>
+        <div class="course-body">
+          <div class="course-specs">
+            <div><div class="spec-num">72</div><div class="spec-lab">Par</div></div>
+            <div><div class="spec-num">6,348</div><div class="spec-lab">Tips</div></div>
+          </div>
+          <p class="course-note">
+            Honest small-town Nebraska golf about two miles east of the hotel. Open to the public —
+            call ahead the day of and see who's in town early enough to play.
+          </p>
+          <table class="tees">
+            <caption>Tees · rating / slope</caption>
+            <tr><th>Tee</th><th>Yards</th><th>Rating</th><th>Slope</th></tr>
+            <tr class="play"><td><span class="tee-dot blue"></span>Blue</td><td>6,348</td><td>70.2</td><td>121</td></tr>
+            <tr class="play"><td><span class="tee-dot white"></span>White</td><td>5,853</td><td>68.2</td><td>111</td></tr>
+          </table>
+          <a class="course-link" href="https://www.crandallcreekgolfclub.com/" target="_blank" rel="noopener">Course website ↗</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LODGING ================= -->
+<section id="stay" class="alt">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Lodging</div>
+      <h2>Where we're sleeping</h2>
+      <p>One night on the interstate, two nights on property. Eight single kings at Dismal — a bed apiece, nobody sharing.</p>
+    </div>
+
+    <div class="stays">
+      <div class="stay card rv">
+        <div class="stay-h">
+          <h3 class="stay-name">Hampton Inn Ogallala</h3>
+          <div class="stay-when">Thu 8/27</div>
+        </div>
+        <div class="stay-addr">502 Oregon Trail Dr, Ogallala, NE 69153 · (308) 284-7140</div>
+        <div class="rooms">
+          <div class="room">
+            <b>Just off I-80</b>
+            <p>Free hot breakfast, indoor pool, free parking. Under two miles from downtown Ogallala and about two miles west of Crandall Creek.</p>
+          </div>
+        </div>
+        <div class="stay-links">
+          <a class="mini" href="https://www.hilton.com/en/hotels/ogapehx-hampton-ogallala/" target="_blank" rel="noopener">Hotel site ↗</a>
+          <a class="mini" href="https://www.google.com/maps/search/?api=1&query=Hampton+Inn+Ogallala+502+Oregon+Trail+Dr+Ogallala+NE" target="_blank" rel="noopener">Map ↗</a>
+          <a class="mini" href="tel:+13082847140">Call</a>
+        </div>
+      </div>
+
+      <div class="stay card rv">
+        <div class="stay-h">
+          <h3 class="stay-name">Dismal River Club</h3>
+          <div class="stay-when">Fri 8/28 – Sat 8/29</div>
+        </div>
+        <div class="stay-addr">83040 Dismal River Trail, Mullen, NE 69152</div>
+        <div class="rooms">
+          <div class="room">
+            <b>Main Lodge — 4 single kings</b>
+            <p>Smaller rooms, but newer. Steps from the clubhouse and the first tee.</p>
+          </div>
+          <div class="room">
+            <b>Lower Lodge — 4 single kings</b>
+            <p>Larger rooms, older finishes. Pick your poison: square footage or fresh paint.</p>
+          </div>
+        </div>
+
+        <div class="amenity-head">On property</div>
+        <div class="amenities">
+          <span class="amenity">⛳ Golf simulator</span>
+          <span class="amenity">🎯 Shooting ranges</span>
+          <span class="amenity">🏊 Pool</span>
+          <span class="amenity">♨️ Hot tub</span>
+          <span class="amenity">🎱 Billiards room</span>
+          <span class="amenity">🎬 Theater</span>
+          <span class="amenity">🏋️ Weight room</span>
+          <span class="amenity">🃏 Card room</span>
+        </div>
+
+        <div class="stay-links">
+          <a class="mini" href="https://dismalriver.com/" target="_blank" rel="noopener">Club site ↗</a>
+          <a class="mini" href="https://www.google.com/maps/search/?api=1&query=Dismal+River+Club+83040+Dismal+River+Trail+Mullen+NE" target="_blank" rel="noopener">Map ↗</a>
+          <a class="mini" href="https://dismalriver.com/faqs-everything-you-need-to-know-about-dismal-river-club-in-nebraskas-sandhills/" target="_blank" rel="noopener">Club FAQ ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROSTER ================= -->
+<section id="roster">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">The Guys</div>
+      <h2>Eight-man field</h2>
+      <p>Two foursomes, ten minutes apart, every round.</p>
+    </div>
+
+    <div class="players rv">
+      <div class="player"><div class="avatar">JK</div><div><div class="player-name">John Kormash</div><div class="player-no">01</div></div></div>
+      <div class="player"><div class="avatar">K</div><div><div class="player-name">Kieron</div><div class="player-no">02</div></div></div>
+      <div class="player"><div class="avatar">J</div><div><div class="player-name">Jeff</div><div class="player-no">03</div></div></div>
+      <div class="player"><div class="avatar">N</div><div><div class="player-name">Nate</div><div class="player-no">04</div></div></div>
+      <div class="player"><div class="avatar">M</div><div><div class="player-name">Matt</div><div class="player-no">05</div></div></div>
+      <div class="player"><div class="avatar">KO</div><div><div class="player-name">Kevin Otto</div><div class="player-no">06</div></div></div>
+      <div class="player"><div class="avatar">C</div><div><div class="player-name">Clayton</div><div class="player-no">07</div></div></div>
+      <div class="player"><div class="avatar">Z</div><div><div class="player-name">Zach</div><div class="player-no">08</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= INFO ================= -->
+<section id="info" class="alt">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Know Before You Go</div>
+      <h2>The Sandhills don't do favors</h2>
+      <p>A few things worth sorting out before we point the cars east on Thursday.</p>
+    </div>
+
+    <div>
+      <div class="card panel rv">
+        <ul class="notes">
+          <li><b>36 a day, two days straight.</b> Whatever shoes you bring, make sure you can walk in them Saturday afternoon.</li>
+          <li><b>Pick a tee and commit.</b> The White tees on the Red still rate 69.9/128, and the middles on the White rate 71.6/139 — there's no shame in playing up when you're going 36 a day.</li>
+          <li><b>Wind is the defense.</b> Open sand country with almost no trees — bring a layer and a windshirt even in August.</li>
+          <li><b>Bring cash.</b> No caddies on this trip — but you'll still want it for tips, the card room, and whatever the matches cost you.</li>
+          <li><b>Service is thin.</b> Expect patchy cell coverage north of Ogallala. Download directions and the playlist before you leave town.</li>
+          <li><b>Gas up in Ogallala.</b> It's 95 miles of two-lane to the club with not much in between.</li>
+          <li><b>Confirm the details.</b> Dress code and club transport should be confirmed with Dismal River before we go.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div class="foot-brand">Dismal River '26</div>
+      <div class="foot-links">
+        <a href="https://dismalriver.com/" target="_blank" rel="noopener">Dismal River Club</a>
+        <a href="https://www.hilton.com/en/hotels/ogapehx-hampton-ogallala/" target="_blank" rel="noopener">Hampton Inn Ogallala</a>
+        <a href="https://www.crandallcreekgolfclub.com/" target="_blank" rel="noopener">Crandall Creek</a>
+        <a href="#top">Back to top</a>
+      </div>
+    </div>
+    <div class="foot-note">August 27–30, 2026 · Denver → Ogallala → Mullen, Nebraska. Tee times and room assignments subject to the club.</div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- COUNTDOWN ---------- */
+  var DEPART = new Date(2026, 7, 27, 7, 0, 0);   // Thu Aug 27, 2026, 7:00am local
+  var END    = new Date(2026, 7, 30, 23, 59, 0); // Sun Aug 30, 2026
+
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+
+  function tick() {
+    var now = new Date();
+    var note = document.getElementById("cd-note");
+    var diff = DEPART - now;
+
+    if (diff <= 0) {
+      document.getElementById("countdown").style.display = "none";
+      note.textContent = now < END ? "We're on the trip. Go play." : "In the books. Same time next year?";
+      return false;
+    }
+
+    var s = Math.floor(diff / 1000);
+    document.getElementById("cd-d").textContent = Math.floor(s / 86400);
+    document.getElementById("cd-h").textContent = pad(Math.floor(s / 3600) % 24);
+    document.getElementById("cd-m").textContent = pad(Math.floor(s / 60) % 60);
+    document.getElementById("cd-s").textContent = pad(s % 60);
+    return true;
+  }
+
+  if (tick()) {
+    var timer = setInterval(function () { if (!tick()) clearInterval(timer); }, 1000);
+  }
+
+  /* ---------- TICKER ---------- */
+  var PHRASES = [
+    "36 holes a day", "Doak's Red", "Nicklaus's White", "Nebraska Sandhills",
+    "8 single kings", "580 miles round trip", "Aug 27–30, 2026",
+    "Golf sim & shooting ranges", "Two foursomes, ten minutes apart"
+  ];
+  var track = document.getElementById("ticker-track");
+  for (var pass = 0; pass < 2; pass++) {
+    PHRASES.forEach(function (p) {
+      var el = document.createElement("span");
+      el.textContent = p;
+      track.appendChild(el);
+    });
+  }
+
+  /* ---------- SCROLL PROGRESS + NAV ---------- */
+  var progress = document.getElementById("progress");
+  var nav = document.getElementById("nav");
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+  var sections = navLinks
+    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+    .filter(Boolean);
+
+  function onScroll() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + "%";
+    nav.classList.toggle("scrolled", window.scrollY > 20);
+
+    var y = window.scrollY + 130;
+    var current = null;
+    sections.forEach(function (sec) { if (sec.offsetTop <= y) current = sec.id; });
+    navLinks.forEach(function (a) {
+      a.classList.toggle("active", a.getAttribute("href") === "#" + current);
+    });
+  }
+  var ticking = false;
+  window.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  onScroll();
+
+  /* ---------- CURSOR GLOW ON CARDS ---------- */
+  if (!reduced && window.matchMedia("(hover: hover)").matches) {
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
+  }
+
+  /* ---------- COUNT-UP NUMBERS ---------- */
+  function countUp(el) {
+    var target = parseFloat(el.dataset.count);
+    var prefix = el.dataset.prefix || "";
+    if (reduced) {
+      el.textContent = prefix + target.toLocaleString("en-US");
+      return;
+    }
+    var dur = 1300, start = null;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = prefix + Math.round(target * eased).toLocaleString("en-US");
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- REVEAL / TRIGGERS ---------- */
+  function activate(el) {
+    el.classList.add("in");
+    if (el.dataset.count) countUp(el);
+  }
+
+  var watched = Array.prototype.slice.call(document.querySelectorAll(".rv, [data-count]"));
+
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e, i) {
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        setTimeout(function () { activate(el); }, reduced ? 0 : Math.min(i * 80, 320));
+        io.unobserve(el);
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+    watched.forEach(function (el) { io.observe(el); });
+  } else {
+    watched.forEach(activate);
+  }
+
+  /* ---------- MAP ---------- */
+  var STOPS = [
+    { n: 1, name: "Denver, CO",        sub: "Start &amp; finish",              ll: [39.7392, -104.9903], gold: true },
+    { n: 2, name: "Hampton Inn",       sub: "Ogallala, NE &middot; Thu 8/27",  ll: [41.1233, -101.7247] },
+    { n: 3, name: "Crandall Creek",    sub: "Optional Thursday 18",            ll: [41.1250, -101.6870] },
+    { n: 4, name: "Dismal River Club", sub: "Mullen, NE &middot; Fri &amp; Sat", ll: [41.9167, -100.9500], gold: true }
+  ];
+  var ROUTE = [[39.7392, -104.9903], [41.1233, -101.7247], [41.9167, -100.9500], [39.7392, -104.9903]];
+
+  function initMap() {
+    if (typeof L === "undefined") {
+      document.getElementById("route-map").style.display = "none";
+      document.getElementById("map-fallback").style.display = "grid";
+      return;
+    }
+
+    // On phones, one-finger panning traps page scroll — leave the map static there
+    // (pinch-zoom and pin taps still work) and let the page scroll normally.
+    var map = L.map("route-map", {
+      scrollWheelZoom: false,
+      dragging: !L.Browser.mobile
+    }).setView([40.9, -102.9], 6);
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 18
+    }).addTo(map);
+
+    // glow underlay + dashed route
+    L.polyline(ROUTE, { color: "#3FCF8E", weight: 9, opacity: 0.16, lineCap: "round" }).addTo(map);
+    L.polyline(ROUTE, { color: "#E3B84F", weight: 2.5, opacity: 0.95, dashArray: "8 10", lineCap: "round" }).addTo(map);
+
+    STOPS.forEach(function (s) {
+      var icon = L.divIcon({
+        className: "",
+        html: '<div class="pin' + (s.gold ? " gold" : "") + '"><span>' + s.n + "</span></div>",
+        iconSize: [32, 32],
+        iconAnchor: [16, 30]
+      });
+      L.marker(s.ll, { icon: icon, title: s.name })
+        .addTo(map)
+        .bindPopup("<strong>" + s.name + "</strong><br>" + s.sub);
+    });
+
+    map.fitBounds(L.latLngBounds(ROUTE), { padding: [48, 48] });
+    map.on("click", function () { map.scrollWheelZoom.enable(); });
+    map.on("mouseout", function () { map.scrollWheelZoom.disable(); });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMap);
+  } else {
+    initMap();
+  }
+})();
+</script>
+</body>
+</html>
