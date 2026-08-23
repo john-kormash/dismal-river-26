@@ -99,6 +99,15 @@
     content:""; position:absolute; left:13px; right:13px; bottom:2px; height:1px;
     background:var(--gold); box-shadow:0 0 8px var(--gold);
   }
+  .nav-links a.nav-book{
+    color:var(--gold); background:rgba(227,184,79,.08);
+    border:1px solid rgba(227,184,79,.3); margin-left:8px;
+  }
+  .nav-links a.nav-book:hover{background:var(--gold); color:#0A1611; border-color:var(--gold)}
+  .nav-links a.nav-book.nav-red{
+    color:var(--red); background:rgba(228,87,75,.08); border-color:rgba(228,87,75,.3);
+  }
+  .nav-links a.nav-book.nav-red:hover{background:var(--red); color:#150B09; border-color:var(--red)}
 
   /* ---------- HERO ---------- */
   .hero{position:relative; overflow:hidden; padding:110px 0 84px; isolation:isolate}
@@ -488,6 +497,8 @@
       <a href="#stay">Lodging</a>
       <a href="#roster">The Guys</a>
       <a href="#info">Before You Go</a>
+      <a class="nav-book nav-red" href="red-course.html">Red Caddy →</a>
+      <a class="nav-book" href="white-course.html">White Book →</a>
     </div>
   </div>
 </nav>
@@ -743,6 +754,7 @@
           </table>
           <p class="tee-src">Yardages from the club scorecard · ratings &amp; slope via the Nebraska Golf Association</p>
           <div class="course-links">
+            <a class="course-link" href="red-course.html">Virtual caddy →</a>
             <a class="course-link" href="https://dismalriver.com/golf/" target="_blank" rel="noopener">Course details ↗</a>
             <a class="course-link" href="https://dismalriver.com/wp-content/uploads/2026/03/Dismal-River-Club-Red-Scorecard.pdf" target="_blank" rel="noopener">Scorecard PDF ↗</a>
           </div>
@@ -773,6 +785,7 @@
           </table>
           <p class="tee-src">Card has no blue/white sets — tees are Back, Middle, Forward. Ratings via the Nebraska Golf Association.</p>
           <div class="course-links">
+            <a class="course-link" href="white-course.html">Hole-by-hole book →</a>
             <a class="course-link" href="https://dismalriver.com/golf/" target="_blank" rel="noopener">Course details ↗</a>
             <a class="course-link" href="https://dismalriver.com/wp-content/uploads/2026/03/Dismal-River-Club-White-Scorecard.pdf" target="_blank" rel="noopener">Scorecard PDF ↗</a>
           </div>
@@ -992,7 +1005,7 @@
   /* ---------- SCROLL PROGRESS + NAV ---------- */
   var progress = document.getElementById("progress");
   var nav = document.getElementById("nav");
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
   var sections = navLinks
     .map(function (a) { return document.querySelector(a.getAttribute("href")); })
     .filter(Boolean);

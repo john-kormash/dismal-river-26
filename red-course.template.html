@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Red Course Caddy</title>
+<meta name="description" content="Tee views and hole-by-hole caddy notes for Tom Doak's Red Course at Dismal River Club. One hole per screen, works with no signal." />
+<meta name="theme-color" content="#0B0907" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Red Caddy" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B0907'/><path d='M38 78 V24' stroke='%23F4EFE6' stroke-width='6' stroke-linecap='round'/><path d='M41 26 L74 36 L41 46 Z' fill='%23E4574B'/></svg>" />
+
+<style>
+  /* ============================================================
+     TOKENS — same system as the White book, warmed toward the
+     Red course: clay off the tee, gold on the approach, green
+     on the green. Dark is the default; "Daylight" is the light
+     set, for reading the screen in open sun.
+     ============================================================ */
+  :root{
+    color-scheme:dark;
+    --bg:#0B0907;
+    --bg-2:#141010;
+    --card:#191413;
+    --surface:rgba(255,255,255,.05);
+    --surface-2:rgba(255,255,255,.09);
+    --line:rgba(255,255,255,.10);
+    --line-2:rgba(255,255,255,.22);
+    --ink:#F2EDE6;
+    --muted:#9C9086;
+    --clay:#E4574B;
+    --clay-soft:rgba(228,87,75,.14);
+    --clay-line:rgba(228,87,75,.36);
+    --gold:#E3B84F;
+    --gold-soft:rgba(227,184,79,.13);
+    --gold-line:rgba(227,184,79,.34);
+    --green:#3FCF8E;
+    --green-soft:rgba(63,207,142,.12);
+    --green-line:rgba(63,207,142,.32);
+    --on-accent:#150B09;
+    --shadow:0 18px 44px -26px rgba(0,0,0,.95);
+
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+
+  @media (prefers-color-scheme:light){
+    :root:not([data-theme="dark"]){
+      color-scheme:light;
+      --bg:#E9E3D7;
+      --bg-2:#EFEAE0;
+      --card:#FCFAF5;
+      --surface:rgba(26,17,14,.035);
+      --surface-2:rgba(26,17,14,.065);
+      --line:rgba(26,17,14,.15);
+      --line-2:rgba(26,17,14,.30);
+      --ink:#1A110E;
+      --muted:#5C4F47;
+      --clay:#A83227;
+      --clay-soft:rgba(168,50,39,.10);
+      --clay-line:rgba(168,50,39,.32);
+      --gold:#8A6714;
+      --gold-soft:rgba(138,103,20,.11);
+      --gold-line:rgba(138,103,20,.34);
+      --green:#0E6B45;
+      --green-soft:rgba(14,107,69,.10);
+      --green-line:rgba(14,107,69,.30);
+      --on-accent:#FCFAF5;
+      --shadow:0 14px 32px -22px rgba(26,17,14,.55);
+    }
+  }
+
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#E9E3D7;
+    --bg-2:#EFEAE0;
+    --card:#FCFAF5;
+    --surface:rgba(26,17,14,.035);
+    --surface-2:rgba(26,17,14,.065);
+    --line:rgba(26,17,14,.15);
+    --line-2:rgba(26,17,14,.30);
+    --ink:#1A110E;
+    --muted:#5C4F47;
+    --clay:#A83227;
+    --clay-soft:rgba(168,50,39,.10);
+    --clay-line:rgba(168,50,39,.32);
+    --gold:#8A6714;
+    --gold-soft:rgba(138,103,20,.11);
+    --gold-line:rgba(138,103,20,.34);
+    --green:#0E6B45;
+    --green-soft:rgba(14,107,69,.10);
+    --green-line:rgba(14,107,69,.30);
+    --on-accent:#FCFAF5;
+    --shadow:0 14px 32px -22px rgba(26,17,14,.55);
+  }
+
+  /* ============================================================
+     FRAME
+     ============================================================ */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+    overflow:hidden;
+  }
+  ::selection{background:var(--clay);color:#fff}
+
+  .book{
+    position:fixed;
+    inset:0;
+    display:grid;
+    /* minmax(0,1fr): without it the rail's min-content width would
+       push the whole column past the edge of the phone. */
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto 1fr auto;
+    background:var(--bg);
+  }
+
+  /* ---------- top bar ---------- */
+  .bar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+    background:var(--bg-2);
+    border-bottom:1px solid var(--line);
+  }
+  .flag{width:15px;height:20px;flex:none;display:block}
+  .flag .pole{stroke:var(--ink);stroke-width:2.4;stroke-linecap:round}
+  .flag .cloth{fill:var(--clay)}
+  .wordmark{
+    font-size:11px;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .wordmark b{color:var(--ink);font-weight:600}
+  .bar-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .icon-btn{
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:15px;
+    line-height:1;
+    text-decoration:none;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .18s,color .18s,border-color .18s;
+  }
+  .icon-btn:hover{color:var(--ink);border-color:var(--line-2)}
+  .icon-btn[hidden]{display:none}
+
+  /* ---------- progress ---------- */
+  .progress{height:2px;background:var(--surface-2);overflow:hidden}
+  .progress i{
+    display:block;
+    height:100%;
+    width:11%;
+    background:linear-gradient(90deg,var(--clay),var(--gold));
+    transition:width .32s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ---------- flip track ---------- */
+  .track{
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .track::-webkit-scrollbar{display:none}
+
+  .page{
+    flex:0 0 100%;
+    width:100%;
+    min-width:0;
+    scroll-snap-align:center;
+    scroll-snap-stop:always;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    scrollbar-width:none;
+  }
+  .page::-webkit-scrollbar{display:none}
+
+  .sheet{
+    max-width:640px;
+    margin-inline:auto;
+    padding:13px 14px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  /* ---------- the photo ---------- */
+  .shot{
+    position:relative;
+    display:block;
+    width:100%;
+    padding:0;
+    margin:0;
+    border:1px solid var(--line);
+    border-radius:15px;
+    overflow:hidden;
+    background:linear-gradient(160deg,#2A211C,#141010);
+    aspect-ratio:1337/827;
+    max-height:min(42vh,340px);
+    cursor:zoom-in;
+    box-shadow:var(--shadow);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .shot-img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .shot-img.ready{opacity:1}
+  .shot-scrim{
+    position:absolute;
+    inset:auto 0 0 0;
+    height:58%;
+    background:linear-gradient(to top,rgba(6,5,4,.82),rgba(6,5,4,.35) 42%,transparent);
+    pointer-events:none;
+  }
+  .shot-num{
+    position:absolute;
+    left:14px;
+    bottom:6px;
+    font-family:var(--serif);
+    font-size:54px;
+    line-height:1;
+    color:#F7F2EA;
+    font-variant-numeric:lining-nums tabular-nums;
+    letter-spacing:-.03em;
+    text-shadow:0 2px 18px rgba(0,0,0,.75);
+    pointer-events:none;
+  }
+  .shot-tag{
+    position:absolute;
+    left:15px;
+    bottom:calc(6px + 54px);
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.72);
+    text-shadow:0 1px 10px rgba(0,0,0,.8);
+    pointer-events:none;
+  }
+  .shot-zoom{
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    display:grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    background:rgba(10,8,7,.5);
+    border:1px solid rgba(255,255,255,.2);
+    color:#F7F2EA;
+    font-size:14px;
+    line-height:1;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    pointer-events:none;
+  }
+  .shot:hover .shot-zoom{background:rgba(10,8,7,.72)}
+
+  /* ---------- carry chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:7px 11px;
+    border-radius:10px;
+    background:var(--clay-soft);
+    border:1px solid var(--clay-line);
+  }
+  .chip .v{
+    font-family:var(--mono);
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--clay);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .chip .l{
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:.01em;
+  }
+
+  /* ---------- strategy blocks ---------- */
+  .blk{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:13px 16px 14px 17px;
+    box-shadow:var(--shadow);
+  }
+  .blk::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:13px;
+    bottom:13px;
+    width:3px;
+    border-radius:0 3px 3px 0;
+    background:var(--rail,var(--line-2));
+  }
+  .blk h2{
+    margin:0 0 6px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--rail,var(--muted));
+  }
+  .blk p{
+    margin:0;
+    font-size:16.5px;
+    line-height:1.46;
+    color:var(--ink);
+    text-wrap:pretty;
+  }
+  .blk.tee{--rail:var(--clay)}
+  .blk.app{--rail:var(--gold)}
+  .blk.grn{--rail:var(--green)}
+
+  .blk.empty{background:transparent;box-shadow:none;border-style:dashed}
+  .blk.empty p{color:var(--muted);font-size:14px;font-style:italic}
+
+  /* ---------- green block ---------- */
+  .green-row{display:flex;gap:14px;align-items:flex-start}
+  .green-text{min-width:0;flex:1}
+  .slope-wrap{flex:none;width:74px;text-align:center}
+  .slope{display:block;width:74px;height:74px}
+  .slope .blob{fill:var(--surface-2);stroke:var(--line-2);stroke-width:1.4}
+  .slope .cont path{fill:none;stroke:var(--muted);stroke-width:1;opacity:.4}
+  .slope .arw path{fill:none;stroke:var(--green);stroke-linecap:round;stroke-linejoin:round}
+  .slope-cap{
+    margin-top:5px;
+    font-size:10px;
+    line-height:1.25;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .tag{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.04em;
+    padding:4px 9px;
+    border-radius:99px;
+    color:var(--green);
+    background:var(--green-soft);
+    border:1px solid var(--green-line);
+  }
+
+  /* ---------- bottom rail ---------- */
+  .rail{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 8px calc(9px + env(safe-area-inset-bottom));
+    background:var(--bg-2);
+    border-top:1px solid var(--line);
+  }
+  .step{
+    flex:none;
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    font-size:17px;
+    line-height:1;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .step:disabled{opacity:.3;cursor:default}
+  .holes{
+    flex:1;
+    min-width:0;
+    display:flex;
+    gap:4px;
+    align-items:center;
+    justify-content:center;
+    overflow-x:auto;
+    scrollbar-width:none;
+    scroll-behavior:smooth;
+    padding:2px;
+  }
+  .holes::-webkit-scrollbar{display:none}
+  .pip{
+    /* Nine of them, and they all fit — they shrink before they scroll. */
+    flex:1 1 0;
+    min-width:0;
+    max-width:38px;
+    height:32px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+    padding:0;
+    transition:background .16s,color .16s,border-color .16s;
+  }
+  .pip:hover{color:var(--ink);border-color:var(--line-2)}
+  .pip[aria-current="true"]{
+    background:var(--clay);
+    border-color:var(--clay);
+    color:#fff;
+    font-weight:700;
+  }
+
+  :focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+
+  /* ============================================================
+     LIGHTBOX — the photo, full screen, pinch or double-tap to
+     zoom. Swipe sideways for the next hole, down to dismiss.
+     ============================================================ */
+  .lb{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    background:#070605;
+    animation:fade .18s ease both;
+  }
+  .lb[hidden]{display:none}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .lb-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:calc(10px + env(safe-area-inset-top)) 12px 10px;
+    color:#F2EDE6;
+  }
+  .lb-title{
+    font-size:11px;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+    color:rgba(242,237,230,.7);
+  }
+  .lb-title b{color:#F2EDE6;font-weight:600}
+  .lb-bar .icon-btn{
+    margin-left:auto;
+    border-color:rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    color:#F2EDE6;
+  }
+
+  .lb-stage{
+    position:relative;
+    overflow:hidden;
+    touch-action:none;
+    display:grid;
+    place-items:center;
+  }
+  .lb-img{
+    max-width:100%;
+    max-height:100%;
+    display:block;
+    transform-origin:center center;
+    will-change:transform;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .lb-img.snap{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+
+  .lb-foot{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+  .lb-foot .step{
+    border-color:rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    color:#F2EDE6;
+  }
+  .lb-hint{
+    flex:1;
+    text-align:center;
+    font-size:11px;
+    letter-spacing:.05em;
+    color:rgba(242,237,230,.45);
+  }
+
+  /* ---------- first-run hint ---------- */
+  /* A full-width bar rather than a centered pill: the rise
+     animation ends on transform:none, which would undo any
+     translate used for centering. */
+  .coach{
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:calc(70px + env(safe-area-inset-bottom));
+    z-index:40;
+    padding:9px 16px;
+    border-radius:99px;
+    background:var(--card);
+    border:1px solid var(--line-2);
+    box-shadow:0 12px 30px -14px rgba(0,0,0,.8);
+    font-size:12.5px;
+    line-height:1.35;
+    text-align:center;
+    color:var(--muted);
+    text-wrap:balance;
+    animation:rise .5s .5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .coach[hidden]{display:none}
+  .coach b{color:var(--ink);font-weight:600}
+
+  /* ---------- motion ---------- */
+  .page.is-active .shot-num,
+  .page.is-active .chips{animation:rise .42s cubic-bezier(.2,.8,.2,1) both}
+  .page.is-active .chips{animation-delay:.05s}
+  @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    .holes{scroll-behavior:auto}
+  }
+
+  /* ---------- small screens ---------- */
+  @media (max-width:400px){
+    .wordmark .long{display:none}
+  }
+  @media (max-width:380px){
+    .sheet{padding:11px 11px 22px;gap:10px}
+    .shot-num{font-size:46px}
+    .shot-tag{bottom:calc(6px + 46px)}
+    .blk p{font-size:15.5px}
+    .slope-wrap,.slope{width:62px}
+    .slope{height:62px}
+  }
+
+  /* ---------- phone on its side: photo left, notes right ---------- */
+  @media (orientation:landscape) and (max-height:560px){
+    .sheet{
+      max-width:none;
+      display:grid;
+      grid-template-columns:minmax(0,42%) minmax(0,1fr);
+      align-items:start;
+      gap:12px;
+      padding:11px 13px 18px;
+    }
+    .shot{grid-row:span 5;max-height:none;position:sticky;top:0}
+    .coach{display:none}
+  }
+
+  @media (min-height:820px){
+    .sheet{gap:14px}
+    .shot{max-height:min(38vh,400px)}
+    .shot-num{font-size:62px}
+    .shot-tag{bottom:calc(6px + 62px)}
+  }
+</style>
+</head>
+<body>
+
+<div class="book">
+
+  <header class="bar">
+    <svg class="flag" viewBox="0 0 24 32" aria-hidden="true">
+      <path class="pole" d="M6 29 V4" />
+      <path class="cloth" d="M7.4 5 L21 9.4 L7.4 13.8 Z" />
+    </svg>
+    <div class="wordmark"><span class="long">Dismal River · </span><b>Red<span class="long"> Course</span></b> · front 9</div>
+    <div class="bar-actions">
+      <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch to daylight mode">☀</button>
+      <a class="icon-btn" id="home-link" href="index.html" aria-label="Back to the trip site" hidden>↩</a>
+    </div>
+  </header>
+
+  <div class="progress" aria-hidden="true"><i id="bar-fill"></i></div>
+
+  <div class="track" id="track" tabindex="0" aria-label="Hole by hole, swipe or use arrow keys"></div>
+
+  <nav class="rail" aria-label="Jump to hole">
+    <button class="step" id="prev" type="button" aria-label="Previous hole">‹</button>
+    <div class="holes" id="holes"></div>
+    <button class="step" id="next" type="button" aria-label="Next hole">›</button>
+  </nav>
+
+</div>
+
+<div class="coach" id="coach" hidden>
+  <span>Swipe for the next hole · <b>tap the photo to zoom</b></span>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Hole photo">
+  <div class="lb-bar">
+    <div class="lb-title" id="lb-title"></div>
+    <button class="icon-btn" id="lb-close" type="button" aria-label="Close photo">✕</button>
+  </div>
+  <div class="lb-stage" id="lb-stage">
+    <img class="lb-img" id="lb-img" alt="" />
+  </div>
+  <div class="lb-foot">
+    <button class="step" id="lb-prev" type="button" aria-label="Previous hole">‹</button>
+    <span class="lb-hint" id="lb-hint">Pinch or double-tap to zoom · swipe down to close</span>
+    <button class="step" id="lb-next" type="button" aria-label="Next hole">›</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     THE BOOK — notes transcribed from the Red course summary.
+     slope.deg is the fall direction: 0 = left to right,
+     90 = away from you (front to back), 180 = right to left,
+     270 = toward you (back to front).
+     Photos live in PHOTOS at the bottom of this file, one
+     base64 JPEG per hole, so the whole thing works with no bars.
+     ============================================================ */
+  var HOLES = [
+    {
+      n: 1,
+      tee: "220 to clear the right corner, fairway hill at 260. Bomb away.",
+      app: "Best layup lands you about 70 yards from the center of the green. Fairway plays uphill to the green. Some room long.",
+      grn: "Two tiers with the front lower. Heavy right to left slope, slight front to back.",
+      keys: [
+        { v: "220", l: "clears the right corner" },
+        { v: "260", l: "the fairway hill" },
+        { v: "70 yds", l: "ideal layup, from center" }
+      ],
+      tags: ["Two tiers", "Front tier lower"],
+      slope: { deg: 135, label: "Right to left", strong: true }
+    },
+    {
+      n: 2,
+      tee: "~250 to clear the corner of the traps on the left. Hole plays heavily uphill. Aim right of the trap on the left.",
+      app: "Hidden ditch on the right — shots right of center funnel into it. Tons of room short and left of the green.",
+      grn: "Humpback with a slight punchbowl on the back right.",
+      keys: [
+        { v: "~250", l: "clears the trap corner, left" },
+        { v: "Uphill", l: "heavily, the whole way" }
+      ],
+      tags: ["Humpback", "Punchbowl back right"],
+      slope: null
+    },
+    {
+      n: 3,
+      tee: "Tons of room short and left. Also room long right and long left.",
+      app: "Massive false front.",
+      grn: "Slight right to left.",
+      keys: [],
+      tags: ["False front"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 4,
+      tee: "Widest landing is 240. Bunker is ~260. Clearing right of the bunker is ideal, but left of it will funnel back to the fairway. Right and 230 or less is the worst landing. Be at or left of the center trap.",
+      app: "Room straight or left, both long and short. Bunker on the back left corner of the green.",
+      grn: "Heavy back to front break. Green dives off on the right side. Multiple tiers, and the front is lower.",
+      keys: [
+        { v: "240", l: "widest landing" },
+        { v: "~260", l: "the bunker" },
+        { v: "≤230", l: "right side — worst landing" }
+      ],
+      tags: ["Multiple tiers", "Front tier lower", "Falls off right"],
+      slope: { deg: 270, label: "Back to front", strong: true }
+    },
+    {
+      n: 5,
+      tee: "Tons of room short left, or right of the green. Must clear 25 yards short of center if going over the trap.",
+      app: "",
+      grn: "Back punchbowl. Predominant right to left break.",
+      keys: [
+        { v: "25 yds", l: "inside center — min carry over the trap" }
+      ],
+      tags: ["Back punchbowl"],
+      slope: { deg: 180, label: "Right to left", strong: true }
+    },
+    {
+      n: 6,
+      tee: "230 to clear the little trap in the center. 230 hit directly at the dune right of the green — or between the dune and the little center trap — is ideal. Must clear 200 to avoid the lefthand slope into native. Dune is ~255 but sits 15 yards lower than the tee. Anything right of the dune will funnel massively downhill.",
+      app: "Room on the right, left will funnel away. Hump on the right side may help anything right. Anything left of center will want to go in the trap.",
+      grn: "",
+      keys: [
+        { v: "230", l: "at the dune — the shot" },
+        { v: "200", l: "min carry, left slope into native" },
+        { v: "~255", l: "the dune, 15 yds below the tee" }
+      ],
+      tags: [],
+      slope: null
+    },
+    {
+      n: 7,
+      tee: "240 shot is ideal. Tons of room left or right if you hit it 220–240. Aim just left of center of the visible trap. Balls left of the trap funnel down a 20 ft hill into safety. Native corner on the right starting at 250.",
+      app: "Room short right and long right. Shots left will funnel down. 50 yards of safety between the back of the trap and the center of the green.",
+      grn: "Mostly back to front, with an upper tier on the top righthand side.",
+      keys: [
+        { v: "240", l: "the shot" },
+        { v: "220–240", l: "room left and right" },
+        { v: "250", l: "native corner, right" }
+      ],
+      tags: ["Upper tier back right"],
+      slope: { deg: 270, label: "Back to front" }
+    },
+    {
+      n: 8,
+      tee: "Fairway widens at ~265 carry. Ideal is slightly left of the traps.",
+      app: "Ideal layup is just left of the trap, about 20 yards past it. Only 8–10 yards separate the visible traps. Don't be right. If going for the green, be short and left or long and right. Tons of room behind. Hidden trap ~40 yards long of center.",
+      grn: "",
+      keys: [
+        { v: "~265", l: "carry — fairway widens" },
+        { v: "8–10 yds", l: "gap between the visible traps" },
+        { v: "~40 yds", l: "hidden trap, long of center" }
+      ],
+      tags: [],
+      slope: null
+    },
+    {
+      n: 9,
+      tee: "Massive ravines on the right. Left is better and the fairway is wide.",
+      app: "Plenty of room short, or long. Long rolls toward native. Do not be left of the green.",
+      grn: "Long but skinny. Minimal break.",
+      keys: [],
+      tags: ["Long and skinny", "Minimal break"],
+      slope: null
+    }
+  ];
+
+  var track = document.getElementById("track");
+  var holesRail = document.getElementById("holes");
+  var barFill = document.getElementById("bar-fill");
+  var prevBtn = document.getElementById("prev");
+  var nextBtn = document.getElementById("next");
+  var themeBtn = document.getElementById("theme-btn");
+  var coach = document.getElementById("coach");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var BLOB = "M39 8 C55 8 70 20 70 38 C70 56 56 70 39 70 C22 70 8 57 8 39 C8 21 23 8 39 8 Z";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* A small plan view of the green: front edge nearest you at the
+     bottom, contour lines across the slope, arrow down the fall line. */
+  function slopeSVG(hole) {
+    var s = hole.slope;
+    if (!s) return "";
+    var rot = -s.deg;
+    var w = s.strong ? 3.6 : 2.5;
+    var id = "clip" + hole.n;
+    return '' +
+      '<div class="slope-wrap">' +
+        '<svg class="slope" viewBox="0 0 78 78" role="img" aria-label="Green falls ' + esc(s.label.toLowerCase()) + '">' +
+          '<defs><clipPath id="' + id + '"><path d="' + BLOB + '"/></clipPath></defs>' +
+          '<path class="blob" d="' + BLOB + '"/>' +
+          '<g class="cont" clip-path="url(#' + id + ')" transform="rotate(' + rot + ' 39 39)">' +
+            '<path d="M21 4 Q27 39 21 74"/>' +
+            '<path d="M35 2 Q41 39 35 76"/>' +
+            '<path d="M49 4 Q55 39 49 74"/>' +
+          '</g>' +
+          '<g class="arw" transform="rotate(' + rot + ' 39 39)" stroke-width="' + w + '">' +
+            '<path d="M21 39 H52"/>' +
+            '<path d="M44 31 L53 39 L44 47"/>' +
+          '</g>' +
+        '</svg>' +
+        '<div class="slope-cap">' + esc(s.label) + '</div>' +
+      '</div>';
+  }
+
+  function block(cls, label, text, extra, emptyMsg) {
+    if (!text) {
+      return '<section class="blk ' + cls + ' empty"><h2>' + label + '</h2>' +
+             "<p>" + (emptyMsg || "Nothing noted here.") + "</p></section>";
+    }
+    return '<section class="blk ' + cls + '"><h2>' + label + '</h2>' +
+           (extra || "<p>" + esc(text) + "</p>") + "</section>";
+  }
+
+  function pageHTML(hole) {
+    var keys = hole.keys.map(function (k) {
+      return '<div class="chip"><span class="v">' + esc(k.v) + "</span>" +
+             '<span class="l">' + esc(k.l) + "</span></div>";
+    }).join("");
+
+    var tags = hole.tags.map(function (t) {
+      return '<span class="tag">' + esc(t) + "</span>";
+    }).join("");
+
+    var greenInner = '<div class="green-row">' + slopeSVG(hole) +
+      '<div class="green-text"><p>' + esc(hole.grn) + "</p>" +
+      (tags ? '<div class="tags">' + tags + "</div>" : "") +
+      "</div></div>";
+
+    return '' +
+      '<article class="page" id="h' + hole.n + '" aria-label="Hole ' + hole.n + '">' +
+        '<div class="sheet">' +
+          '<button type="button" class="shot" data-hole="' + hole.n + '"' +
+                 ' aria-label="Hole ' + hole.n + ' from the tee — tap to zoom">' +
+            '<img class="shot-img" alt="" />' +
+            '<span class="shot-scrim"></span>' +
+            '<span class="shot-tag">Tee view</span>' +
+            '<span class="shot-num">' + hole.n + "</span>" +
+            '<span class="shot-zoom" aria-hidden="true">⤢</span>' +
+          "</button>" +
+          (keys ? '<div class="chips">' + keys + "</div>" : "") +
+          block("tee", "Off the tee", hole.tee) +
+          block("app", "Approach", hole.app, null, "No separate approach note — the tee line covers it.") +
+          block("grn", "The green", hole.grn, greenInner, "No green notes for this one.") +
+        "</div>" +
+      "</article>";
+  }
+
+  track.innerHTML = HOLES.map(pageHTML).join("");
+
+  var pages = Array.prototype.slice.call(track.querySelectorAll(".page"));
+  var shots = pages.map(function (p) { return p.querySelector(".shot-img"); });
+
+  /* ---------- bottom rail ---------- */
+  HOLES.forEach(function (hole, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "pip";
+    b.textContent = hole.n;
+    b.setAttribute("aria-label", "Hole " + hole.n);
+    b.addEventListener("click", function () { goTo(i, true); });
+    holesRail.appendChild(b);
+  });
+  var pips = Array.prototype.slice.call(holesRail.querySelectorAll(".pip"));
+
+  /* ---------- photos ----------
+     Every JPEG is already in the file, but decoding nine of them at
+     once is a lot to ask of a phone. Only the current hole and its
+     neighbours get a src; the rest are dropped again. */
+  function hydrate(i) {
+    shots.forEach(function (img, n) {
+      var near = Math.abs(n - i) <= 2;
+      if (near && !img.src) {
+        img.addEventListener("load", function () { img.classList.add("ready"); }, { once: true });
+        img.src = PHOTOS[HOLES[n].n];
+        img.alt = "Hole " + HOLES[n].n + " from the tee";
+      } else if (!near && img.src) {
+        img.removeAttribute("src");
+        img.classList.remove("ready");
+      }
+    });
+  }
+
+  /* ---------- navigation ---------- */
+  var current = -1;
+  var settling = null;      // hole we're animating toward, if any
+  var settleTimer;
+
+  function goTo(i, smooth) {
+    i = Math.max(0, Math.min(HOLES.length - 1, i));
+    var animate = smooth && !reduced && Math.abs(i - current) > 0;
+    if (animate) {
+      // Ignore the holes we sail past on the way, so only the
+      // destination plays its entrance.
+      settling = i;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { settling = null; }, 700);
+    }
+    track.scrollTo({
+      left: i * track.clientWidth,
+      behavior: animate ? "smooth" : "auto"
+    });
+    setCurrent(i);
+  }
+
+  function setCurrent(i) {
+    if (i === current) return;
+    current = i;
+
+    hydrate(i);
+
+    pips.forEach(function (p, n) {
+      if (n === i) { p.setAttribute("aria-current", "true"); }
+      else { p.removeAttribute("aria-current"); }
+    });
+    pages.forEach(function (p, n) { p.classList.toggle("is-active", n === i); });
+
+    barFill.style.width = ((i + 1) / HOLES.length) * 100 + "%";
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === HOLES.length - 1;
+
+    pips[i].scrollIntoView({ inline: "center", block: "nearest" });
+    if (!lb.hidden) paintLightbox();
+
+    try {
+      localStorage.setItem("dr-red-hole", String(HOLES[i].n));
+      history.replaceState(null, "", "#h" + HOLES[i].n);
+    } catch (e) { /* private mode — nav still works */ }
+  }
+
+  var ticking = false;
+  track.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var w = track.clientWidth;
+      if (w > 0) {
+        var i = Math.round(track.scrollLeft / w);
+        if (settling === null) {
+          setCurrent(i);
+        } else if (i === settling) {
+          settling = null;
+          clearTimeout(settleTimer);
+        }
+      }
+      ticking = false;
+    });
+  }, { passive: true });
+
+  prevBtn.addEventListener("click", function () { goTo(current - 1, true); });
+  nextBtn.addEventListener("click", function () { goTo(current + 1, true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Escape" && !lb.hidden) { closeLightbox(); e.preventDefault(); return; }
+    if (e.key === "ArrowRight") { goTo(current + 1, true); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { goTo(current - 1, true); e.preventDefault(); }
+    else if (e.key === "Home") { goTo(0, true); e.preventDefault(); }
+    else if (e.key === "End") { goTo(HOLES.length - 1, true); e.preventDefault(); }
+  });
+
+  // Keep the current hole centered if the phone rotates.
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    var keep = current;
+    resizeTimer = setTimeout(function () {
+      track.scrollTo({ left: keep * track.clientWidth, behavior: "auto" });
+      if (!lb.hidden) resetZoom(false);
+    }, 120);
+  });
+
+  /* ============================================================
+     LIGHTBOX
+     ============================================================ */
+  var lb = document.getElementById("lb");
+  var lbImg = document.getElementById("lb-img");
+  var lbTitle = document.getElementById("lb-title");
+  var lbStage = document.getElementById("lb-stage");
+
+  var scale = 1, tx = 0, ty = 0;
+  var pointers = new Map();
+  var pinchDist = 0, pinchMid = null;
+  var dragged = false, startX = 0, startY = 0, startTx = 0, startTy = 0;
+  var lastTap = 0, lastTapX = 0, lastTapY = 0;
+
+  function paint(snap) {
+    lbImg.classList.toggle("snap", !!snap && !reduced);
+    lbImg.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
+    if (snap) {
+      setTimeout(function () { lbImg.classList.remove("snap"); }, 240);
+    }
+  }
+
+  function clamp() {
+    var maxX = Math.max(0, (lbImg.clientWidth * scale - lbStage.clientWidth) / 2);
+    var maxY = Math.max(0, (lbImg.clientHeight * scale - lbStage.clientHeight) / 2);
+    tx = Math.max(-maxX, Math.min(maxX, tx));
+    ty = Math.max(-maxY, Math.min(maxY, ty));
+  }
+
+  function resetZoom(snap) {
+    scale = 1; tx = 0; ty = 0;
+    paint(snap);
+  }
+
+  // Zoom about a point in viewport coordinates, keeping whatever
+  // is under the finger under the finger.
+  function zoomAbout(next, px, py, snap) {
+    next = Math.max(1, Math.min(6, next));
+    var r = lbStage.getBoundingClientRect();
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height / 2;
+    tx += (px - cx - tx) * (1 - next / scale);
+    ty += (py - cy - ty) * (1 - next / scale);
+    scale = next;
+    clamp();
+    paint(snap);
+  }
+
+  function paintLightbox() {
+    var hole = HOLES[current];
+    lbImg.src = PHOTOS[hole.n];
+    lbImg.alt = "Hole " + hole.n + " from the tee";
+    lbTitle.innerHTML = "<b>Hole " + hole.n + "</b> · tee view";
+    resetZoom(false);
+  }
+
+  function openLightbox() {
+    lb.hidden = false;
+    paintLightbox();
+    document.getElementById("lb-close").focus();
+  }
+
+  function closeLightbox() {
+    lb.hidden = true;
+    lbImg.removeAttribute("src");
+    pointers.clear();
+  }
+
+  track.addEventListener("click", function (e) {
+    var shot = e.target.closest && e.target.closest(".shot");
+    if (!shot) return;
+    dismissCoach();
+    var i = HOLES.findIndex(function (h) {
+      return String(h.n) === shot.getAttribute("data-hole");
+    });
+    if (i >= 0 && i !== current) goTo(i, false);
+    openLightbox();
+  });
+
+  document.getElementById("lb-close").addEventListener("click", closeLightbox);
+  document.getElementById("lb-prev").addEventListener("click", function () { goTo(current - 1, false); });
+  document.getElementById("lb-next").addEventListener("click", function () { goTo(current + 1, false); });
+
+  lbStage.addEventListener("pointerdown", function (e) {
+    lbStage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      var p = Array.from(pointers.values());
+      pinchDist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      pinchMid = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+    } else if (pointers.size === 1) {
+      dragged = false;
+      startX = e.clientX; startY = e.clientY;
+      startTx = tx; startTy = ty;
+    }
+  });
+
+  lbStage.addEventListener("pointermove", function (e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      var p = Array.from(pointers.values());
+      var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      var mid = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+      if (pinchDist > 0) {
+        // Pan with the midpoint as well as scale about it.
+        tx += mid.x - pinchMid.x;
+        ty += mid.y - pinchMid.y;
+        zoomAbout(scale * (d / pinchDist), mid.x, mid.y, false);
+      }
+      pinchDist = d;
+      pinchMid = mid;
+      dragged = true;
+      return;
+    }
+
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragged = true;
+
+    if (scale > 1) {
+      tx = startTx + dx;
+      ty = startTy + dy;
+      clamp();
+      paint(false);
+    } else {
+      // Zoomed out: the drag is a gesture, so let the photo follow
+      // the finger a little to show it landed.
+      lbImg.style.transform = "translate(" + dx * 0.4 + "px," + dy * 0.4 + "px) scale(1)";
+    }
+  });
+
+  function endPointer(e) {
+    if (!pointers.has(e.pointerId)) return;
+    var wasPinch = pointers.size === 2;
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchDist = 0;
+
+    if (wasPinch) {
+      if (scale <= 1.02) resetZoom(true);
+      // Re-anchor the surviving finger so panning doesn't jump.
+      var left = Array.from(pointers.values())[0];
+      if (left) { startX = left.x; startY = left.y; startTx = tx; startTy = ty; }
+      return;
+    }
+    if (pointers.size > 0) return;
+
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+
+    if (scale === 1 && dragged) {
+      // A flick at rest: sideways changes hole, down dismisses.
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
+        goTo(current + (dx < 0 ? 1 : -1), false);
+      } else if (dy > 75) {
+        closeLightbox();
+        return;
+      }
+      paint(true);
+      return;
+    }
+
+    if (dragged) return;
+
+    // A clean tap — double it to zoom.
+    var now = Date.now();
+    var quick = now - lastTap < 300 &&
+                Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 32;
+    lastTap = now; lastTapX = e.clientX; lastTapY = e.clientY;
+    if (quick) {
+      lastTap = 0;
+      if (scale > 1.02) resetZoom(true);
+      else zoomAbout(2.6, e.clientX, e.clientY, true);
+    }
+  }
+
+  lbStage.addEventListener("pointerup", endPointer);
+  lbStage.addEventListener("pointercancel", endPointer);
+
+  lbStage.addEventListener("dblclick", function (e) { e.preventDefault(); });
+
+  lbStage.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    zoomAbout(scale * (e.deltaY < 0 ? 1.14 : 1 / 1.14), e.clientX, e.clientY, false);
+  }, { passive: false });
+
+  /* ---------- daylight mode ---------- */
+  function applyTheme(mode) {
+    if (mode) { document.documentElement.setAttribute("data-theme", mode); }
+    else { document.documentElement.removeAttribute("data-theme"); }
+
+    var dark = mode
+      ? mode === "dark"
+      : !window.matchMedia("(prefers-color-scheme: light)").matches;
+
+    themeBtn.textContent = dark ? "☀" : "☾";
+    themeBtn.setAttribute("aria-label", dark ? "Switch to daylight mode" : "Switch to night mode");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#0B0907" : "#E9E3D7");
+  }
+
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("dr-red-theme"); } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeBtn.addEventListener("click", function () {
+    var isDark = themeBtn.textContent === "☀";
+    var next = isDark ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("dr-red-theme", next); } catch (e) {}
+  });
+
+  /* ---------- first-run hint ---------- */
+  var seen = false;
+  try { seen = localStorage.getItem("dr-red-seen") === "1"; } catch (e) {}
+  if (!seen) coach.hidden = false;
+
+  function dismissCoach() {
+    if (coach.hidden) return;
+    coach.hidden = true;
+    try { localStorage.setItem("dr-red-seen", "1"); } catch (e) {}
+  }
+  // Armed late so the opening scroll to the saved hole doesn't count.
+  setTimeout(function () {
+    track.addEventListener("scroll", dismissCoach, { once: true, passive: true });
+  }, 500);
+  setTimeout(dismissCoach, 9000);
+
+  /* ---------- opening hole ---------- */
+  var start = 0;
+  var fromHash = /^#h([1-9])$/.exec(location.hash);
+  if (fromHash) {
+    start = parseInt(fromHash[1], 10) - 1;
+  } else {
+    try {
+      var last = parseInt(localStorage.getItem("dr-red-hole"), 10);
+      if (last >= 1 && last <= HOLES.length) start = last - 1;
+    } catch (e) {}
+  }
+
+  // The track has no width until layout settles on some mobile browsers.
+  requestAnimationFrame(function () {
+    track.scrollTo({ left: start * track.clientWidth, behavior: "auto" });
+    current = -1;
+    setCurrent(start);
+  });
+
+  // The back link only makes sense next to the trip site's index.html.
+  if (/red-course\.html$/i.test(location.pathname)) {
+    document.getElementById("home-link").hidden = false;
+  }
+
+  /* ============================================================
+     PHOTOS — nine tee views, base64 JPEG, generated by
+     build-red-course.py from Course Images/Red/. Nothing below
+     this line is meant to be edited by hand.
+     ============================================================ */
+  /*__PHOTOS__*/
+})();
+</script>
+</body>
+</html>

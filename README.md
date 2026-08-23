@@ -4,7 +4,14 @@ A single-page site for the August 27–30, 2026 golf trip: Denver → Ogallala �
 
 ## What's here
 
-- `index.html` — the entire site. No build step, no dependencies to install.
+- `index.html` — the trip site. No build step, no dependencies to install.
+- `white-course.html` — the on-course yardage book for the White Course. One hole
+  per screen, swipe or arrow-key to flip. **Fully self-contained** — no fonts, scripts
+  or tiles from any CDN, so it still works once you're north of Ogallala with no bars.
+- `red-course.html` — the virtual caddy for the Red Course, front nine. Same idea, plus
+  the tee view for every hole: tap the photo for full screen, pinch or double-tap to zoom
+  in on a bunker. The nine JPEGs are baked into the file as base64, so it is one 2 MB
+  file with **zero** network requests. Generated — see below.
 
 ## Run it locally
 
@@ -44,12 +51,54 @@ Everything is in `index.html`:
 | Roster | `<section id="roster">` |
 | Trip notes | `<section id="info">` |
 
+### The Red Course caddy
+
+`red-course.html` is **generated** — edit `red-course.template.html` and rebuild:
+
+```bash
+pip install pillow
+python build-red-course.py
+```
+
+The script encodes `Course Images/Red/DismalRed_1..9.png` as base64 JPEGs (quality 86,
+~200 KB each) and drops them into the template's `/*__PHOTOS__*/` marker. The notes live
+in the `HOLES` array near the top of the template's `<script>`; everything below the
+PHOTOS banner is machine-written. Fields are the same as the White book's `HOLES`
+(`tee` / `app` / `grn` / `keys` / `tags` / `slope`) minus `par`, `hcp` and `y` — the club's
+Red scorecard isn't transcribed per hole yet, so the cards carry notes and photos only.
+
+Only the current hole and its two neighbours hold a decoded photo at a time; the rest
+have their `src` dropped, which keeps memory sane on an older phone.
+
+### The White Course book
+
+The yardage book is driven by one array — `HOLES` in the `<script>` of `white-course.html`.
+Each entry is a hole:
+
+| Field | What it does |
+|---|---|
+| `par` / `hcp` | Par and stroke index, from the scorecard. On a par 3 the empty Approach block explains itself instead of saying "no notes". |
+| `y` | Yardages per tee — `{ back, mid, fwd }`. An array (holes 2, 7, 16) renders both back tee boxes. |
+| `tee` / `app` / `grn` | The three note blocks. An empty string renders a quiet "No notes" panel. |
+| `keys` | Yardage chips at the top of the card — `{ v: "260", l: "widest fairway" }` |
+| `tags` | Pills under the green notes (Punchbowl, Backstop, False front…) |
+| `slope` | Draws the green diagram. `deg` is the fall line: `0` left→right, `90` front→back, `180` right→left, `270` back→front. `strong: true` thickens the arrow. `null` hides the diagram. |
+
 ## External dependencies (loaded from CDN, needs internet)
+
+`index.html` only:
 
 - [Leaflet 1.9.4](https://leafletjs.com/) + CARTO basemap tiles for the route map
 - Google Fonts: Instrument Serif, Inter
 
 If the map can't load, the page falls back to a plain text route summary.
+
+`white-course.html` and `red-course.html` have **no external dependencies at all** — that's
+deliberate, since they're the pages you actually open in the middle of the Sandhills. They use
+the same visual system as the trip site but resolve the typefaces from the system stack instead
+of Google Fonts. Open them once on the drive up and they stay cached; add them to your home
+screen and they open full-screen. Each remembers the last hole you looked at and its light/dark
+choice, and `#h7` in the URL jumps to a hole.
 
 ## Tee rating / slope sources
 
@@ -63,8 +112,13 @@ The scorecards don't print course rating or slope, so those come from the
 [Nebraska Golf Association course directory](https://www.nebgolf.org/course-directory/dismal-river-club/).
 Crandall Creek's Blue and White figures come from its published scorecard data.
 
-The White Course's back tee has two configurations — 7,398 and 7,275 yards, differing on holes 2 and 7.
-The site shows the longer one, which is what the NGA rated.
+The White Course's back tee has two configurations — 7,398 and 7,275 yards, differing on holes
+**2 (510/455), 7 (475/437) and 16 (430/400)** — 123 yards across the three. The site shows the
+longer one, which is what the NGA rated; the yardage book shows both.
+
+Per-hole par, handicap and yardages in `white-course.html` are transcribed from the White
+scorecard PDF and cross-checked against every printed subtotal (OUT/IN/TOT for all four tee
+configurations, plus par 36/36/72 and stroke indexes 1–18 each appearing once). All 15 checks pass.
 
 ## Trip reference
 
