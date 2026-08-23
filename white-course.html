@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>White Course Yardage Book</title>
+<meta name="description" content="Hole-by-hole tee, approach and green notes for the Nicklaus White Course at Dismal River Club. Built to flip through on a phone, on the course." />
+<meta name="theme-color" content="#070E0B" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="White Course" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23070E0B'/><path d='M38 78 V24' stroke='%23EAF2ED' stroke-width='6' stroke-linecap='round'/><path d='M41 26 L74 36 L41 46 Z' fill='%23E3B84F'/></svg>" />
+
+<style>
+  /* ============================================================
+     TOKENS — dark is the default; the light set is "Daylight",
+     for reading the screen in open sun. Three states are covered:
+     bare :root (dark), OS light with no stamp, explicit stamp.
+     ============================================================ */
+  :root{
+    color-scheme:dark;
+    --bg:#070E0B;
+    --bg-2:#0A1611;
+    --card:#0D1D16;
+    --surface:rgba(255,255,255,.045);
+    --surface-2:rgba(255,255,255,.085);
+    --line:rgba(255,255,255,.10);
+    --line-2:rgba(255,255,255,.22);
+    --ink:#EAF2ED;
+    --muted:#8CA398;
+    --gold:#E3B84F;
+    --gold-soft:rgba(227,184,79,.13);
+    --gold-line:rgba(227,184,79,.34);
+    --green:#3FCF8E;
+    --green-soft:rgba(63,207,142,.12);
+    --green-line:rgba(63,207,142,.32);
+    --on-accent:#08130E;
+    --shadow:0 18px 44px -26px rgba(0,0,0,.95);
+
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+
+  @media (prefers-color-scheme:light){
+    :root:not([data-theme="dark"]){
+      color-scheme:light;
+      --bg:#E7E4D8;
+      --bg-2:#EDEAE0;
+      --card:#FBFAF5;
+      --surface:rgba(11,22,17,.035);
+      --surface-2:rgba(11,22,17,.065);
+      --line:rgba(11,22,17,.15);
+      --line-2:rgba(11,22,17,.30);
+      --ink:#0B1611;
+      --muted:#4C5F55;
+      --gold:#8A6714;
+      --gold-soft:rgba(138,103,20,.11);
+      --gold-line:rgba(138,103,20,.34);
+      --green:#0E6B45;
+      --green-soft:rgba(14,107,69,.10);
+      --green-line:rgba(14,107,69,.30);
+      --on-accent:#FBFAF5;
+      --shadow:0 14px 32px -22px rgba(11,22,17,.55);
+    }
+  }
+
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#E7E4D8;
+    --bg-2:#EDEAE0;
+    --card:#FBFAF5;
+    --surface:rgba(11,22,17,.035);
+    --surface-2:rgba(11,22,17,.065);
+    --line:rgba(11,22,17,.15);
+    --line-2:rgba(11,22,17,.30);
+    --ink:#0B1611;
+    --muted:#4C5F55;
+    --gold:#8A6714;
+    --gold-soft:rgba(138,103,20,.11);
+    --gold-line:rgba(138,103,20,.34);
+    --green:#0E6B45;
+    --green-soft:rgba(14,107,69,.10);
+    --green-line:rgba(14,107,69,.30);
+    --on-accent:#FBFAF5;
+    --shadow:0 14px 32px -22px rgba(11,22,17,.55);
+  }
+
+  /* ============================================================
+     FRAME
+     ============================================================ */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+    overflow:hidden;
+  }
+  ::selection{background:var(--gold);color:var(--on-accent)}
+
+  .book{
+    position:fixed;
+    inset:0;
+    display:grid;
+    /* minmax(0,1fr): without it the rail's eighteen pips set the
+       column's min-content width and push the cards off the phone. */
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto 1fr auto;
+    background:var(--bg);
+  }
+
+  /* ---------- top bar ---------- */
+  .bar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+    background:var(--bg-2);
+    border-bottom:1px solid var(--line);
+  }
+  .flag{width:15px;height:20px;flex:none;display:block}
+  .flag .pole{stroke:var(--ink);stroke-width:2.4;stroke-linecap:round}
+  .flag .cloth{fill:var(--gold)}
+  .wordmark{
+    font-size:11px;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .wordmark b{color:var(--ink);font-weight:600}
+  .bar-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .icon-btn{
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:15px;
+    line-height:1;
+    text-decoration:none;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .18s,color .18s,border-color .18s;
+  }
+  .icon-btn:hover{color:var(--ink);border-color:var(--line-2)}
+  .icon-btn[hidden]{display:none}
+
+  /* ---------- progress ---------- */
+  .progress{height:2px;background:var(--surface-2);overflow:hidden}
+  .progress i{
+    display:block;
+    height:100%;
+    width:5.5%;
+    background:linear-gradient(90deg,var(--green),var(--gold));
+    transition:width .32s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ---------- flip track ---------- */
+  .track{
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .track::-webkit-scrollbar{display:none}
+
+  .page{
+    flex:0 0 100%;
+    width:100%;
+    min-width:0;
+    scroll-snap-align:center;
+    scroll-snap-stop:always;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    scrollbar-width:none;
+  }
+  .page::-webkit-scrollbar{display:none}
+
+  .sheet{
+    max-width:620px;
+    margin-inline:auto;
+    padding:16px 15px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+  }
+
+  /* ---------- hole header ---------- */
+  .hole-head{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:4px 2px 2px;
+    overflow:hidden;
+  }
+  .contour{
+    position:absolute;
+    inset:-14px -20px auto;
+    height:96px;
+    width:calc(100% + 40px);
+    opacity:.4;
+    pointer-events:none;
+  }
+  .contour path{fill:none;stroke:var(--gold-line);stroke-width:1}
+  .num{
+    position:relative;
+    font-family:var(--serif);
+    font-size:58px;
+    line-height:.86;
+    color:var(--gold);
+    font-variant-numeric:lining-nums tabular-nums;
+    letter-spacing:-.03em;
+  }
+  .head-meta{position:relative;min-width:0}
+  .eyebrow{
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .head-meta .of{
+    margin-top:3px;
+    font-size:13px;
+    color:var(--ink);
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* all three tee yardages, scorecard-style, right of the hole number.
+     Tapping one marks it as yours; every number stays on the page. */
+  .head-stat{
+    position:relative;
+    margin-left:auto;
+    flex:none;
+    display:flex;
+    gap:3px;
+  }
+  .teecol{
+    appearance:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+    min-width:46px;
+    padding:5px 6px 6px;
+    border:1px solid transparent;
+    border-radius:9px;
+    background:transparent;
+    font-family:inherit;
+    cursor:pointer;
+    transition:background .16s,border-color .16s;
+  }
+  .teecol .tl{
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .teecol .tv{
+    font-family:var(--mono);
+    font-size:18px;
+    font-weight:700;
+    line-height:1.05;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .teecol .tv .alt{display:block;font-size:11px;font-weight:600;opacity:.7}
+  .teecol:hover{background:var(--surface)}
+  .teecol[aria-pressed="true"]{border-color:var(--gold-line);background:var(--gold-soft)}
+  .teecol[aria-pressed="true"] .tl{color:var(--gold)}
+  .teecol[aria-pressed="true"] .tv{color:var(--ink)}
+
+  /* ---------- carry chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:10px;
+    background:var(--gold-soft);
+    border:1px solid var(--gold-line);
+  }
+  .chip .v{
+    font-family:var(--mono);
+    font-size:15px;
+    font-weight:700;
+    color:var(--gold);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .chip .l{
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:.01em;
+  }
+
+  /* ---------- strategy blocks ---------- */
+  .blk{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:14px 16px 15px 17px;
+    box-shadow:var(--shadow);
+  }
+  .blk::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:13px;
+    bottom:13px;
+    width:3px;
+    border-radius:0 3px 3px 0;
+    background:var(--rail,var(--line-2));
+  }
+  .blk h2{
+    margin:0 0 7px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--rail,var(--muted));
+  }
+  .blk p{
+    margin:0;
+    font-size:16.5px;
+    line-height:1.48;
+    color:var(--ink);
+    text-wrap:pretty;
+  }
+  .blk.tee{--rail:var(--gold)}
+  .blk.app{--rail:var(--muted)}
+  .blk.grn{--rail:var(--green)}
+
+  .blk.empty{background:transparent;box-shadow:none;border-style:dashed}
+  .blk.empty p{color:var(--muted);font-size:14px;font-style:italic}
+
+  /* ---------- green block ---------- */
+  .green-row{display:flex;gap:14px;align-items:flex-start}
+  .green-text{min-width:0;flex:1}
+  .slope-wrap{flex:none;width:78px;text-align:center}
+  .slope{display:block;width:78px;height:78px}
+  .slope .blob{fill:var(--surface-2);stroke:var(--line-2);stroke-width:1.4}
+  .slope .cont path{fill:none;stroke:var(--muted);stroke-width:1;opacity:.4}
+  .slope .arw path{fill:none;stroke:var(--green);stroke-linecap:round;stroke-linejoin:round}
+  .slope-cap{
+    margin-top:5px;
+    font-size:10px;
+    line-height:1.25;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tag{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.04em;
+    padding:4px 9px;
+    border-radius:99px;
+    color:var(--green);
+    background:var(--green-soft);
+    border:1px solid var(--green-line);
+  }
+
+  /* ---------- bottom rail ---------- */
+  .rail{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 8px calc(9px + env(safe-area-inset-bottom));
+    background:var(--bg-2);
+    border-top:1px solid var(--line);
+  }
+  .step{
+    flex:none;
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    font-size:17px;
+    line-height:1;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .step:disabled{opacity:.3;cursor:default}
+  .holes{
+    flex:1;
+    min-width:0;
+    display:flex;
+    gap:5px;
+    align-items:center;
+    overflow-x:auto;
+    scrollbar-width:none;
+    scroll-behavior:smooth;
+    padding:2px;
+  }
+  .holes::-webkit-scrollbar{display:none}
+  .turn{
+    flex:none;
+    width:1px;
+    height:20px;
+    background:var(--line-2);
+    margin:0 4px;
+  }
+  .pip{
+    flex:none;
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+    padding:0;
+    transition:background .16s,color .16s,border-color .16s;
+  }
+  .pip:hover{color:var(--ink);border-color:var(--line-2)}
+  .pip[aria-current="true"]{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--on-accent);
+    font-weight:700;
+  }
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ---------- motion ---------- */
+  .page.is-active .num,
+  .page.is-active .chips{animation:rise .42s cubic-bezier(.2,.8,.2,1) both}
+  .page.is-active .chips{animation-delay:.05s}
+  @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    .holes{scroll-behavior:auto}
+  }
+
+  /* ---------- small screens ---------- */
+  @media (max-width:400px){
+    .wordmark .long{display:none}
+  }
+  @media (max-width:380px){
+    .sheet{padding:14px 12px 22px;gap:11px}
+    .hole-head{gap:10px}
+    .num{font-size:50px}
+    .teecol{min-width:40px;padding:4px 4px 5px}
+    .teecol .tv{font-size:16px}
+    .blk p{font-size:15.5px}
+    .slope-wrap,.slope{width:64px}
+    .slope{height:64px}
+  }
+  @media (min-height:760px){
+    .sheet{gap:16px}
+    .num{font-size:70px}
+  }
+</style>
+</head>
+<body>
+
+<div class="book">
+
+  <header class="bar">
+    <svg class="flag" viewBox="0 0 24 32" aria-hidden="true">
+      <path class="pole" d="M6 29 V4" />
+      <path class="cloth" d="M7.4 5 L21 9.4 L7.4 13.8 Z" />
+    </svg>
+    <div class="wordmark"><span class="long">Dismal River · </span><b>White<span class="long"> Course</span></b></div>
+    <div class="bar-actions">
+      <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch to daylight mode">☀</button>
+      <a class="icon-btn" id="home-link" href="index.html" aria-label="Back to the trip site" hidden>↩</a>
+    </div>
+  </header>
+
+  <div class="progress" aria-hidden="true"><i id="bar-fill"></i></div>
+
+  <div class="track" id="track" tabindex="0" aria-label="Hole by hole, swipe or use arrow keys"></div>
+
+  <nav class="rail" aria-label="Jump to hole">
+    <button class="step" id="prev" type="button" aria-label="Previous hole">‹</button>
+    <div class="holes" id="holes"></div>
+    <button class="step" id="next" type="button" aria-label="Next hole">›</button>
+  </nav>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     THE BOOK. Notes are transcribed from the course summary.
+     slope: deg is the fall direction — 0 = left to right,
+     90 = away from you (front to back), 180 = right to left,
+     270 = toward you (back to front).
+     ============================================================ */
+  var HOLES = [
+    {
+      n: 1,
+      par: 4, hcp: 7,
+      y: { back: 433, mid: 412, fwd: 275 },
+      tee: "Aim right side of bunkers on left. Feeds into natural bowl with view of green. Shots right of center can feed into native grass.",
+      app: "No room long or on either side.",
+      grn: "Punchbowl green, feeds left to right. Min carry is 15 yards short of center if going over trap.",
+      keys: [{ v: "15 yds", l: "inside center — min carry over the trap" }],
+      tags: ["Punchbowl"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 2,
+      par: 4, hcp: 1,
+      y: { back: [510, 455], mid: 415, fwd: 343 },
+      tee: "Severe drop on right side.",
+      app: "Room long only.",
+      grn: "Punchbowl green, upper shelf on left then slopes left to right.",
+      keys: [],
+      tags: ["Punchbowl", "Upper shelf left"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 3,
+      par: 3, hcp: 17,
+      y: { back: 187, mid: 145, fwd: 88 },
+      tee: "Left or long are safer.",
+      app: "",
+      grn: "Humpback green with shelf in the middle.",
+      keys: [],
+      tags: ["Humpback", "Center shelf"],
+      slope: null
+    },
+    {
+      n: 4,
+      par: 5, hcp: 9,
+      y: { back: 578, mid: 498, fwd: 416 },
+      tee: "Fairway gets skinny around 255 yards. Traps on left are about 260 out.",
+      app: "Massive landing area right of windmill. Windmill is in a small pond.",
+      grn: "Slopes front to back and left to right. Upper and lower shelves with a backstop.",
+      keys: [
+        { v: "255", l: "fairway narrows" },
+        { v: "260", l: "traps on the left" }
+      ],
+      tags: ["Two shelves", "Backstop"],
+      slope: { deg: 45, label: "Left to right, front to back" }
+    },
+    {
+      n: 5,
+      par: 3, hcp: 11,
+      y: { back: 187, mid: 155, fwd: 120 },
+      tee: "5–6 yards uphill. Room long but rolls off back.",
+      app: "",
+      grn: "Punch bowl on sides, but false front and balls in back will roll off.",
+      keys: [{ v: "5–6 yds", l: "plays uphill" }],
+      tags: ["Punchbowl sides", "False front"],
+      slope: null
+    },
+    {
+      n: 6,
+      par: 4, hcp: 13,
+      y: { back: 348, mid: 313, fwd: 263 },
+      tee: "Best shot is short right of trap, ~230 yards.",
+      app: "No room long or on either side. Trap long of green.",
+      grn: "Steep bowl with a backstop.",
+      keys: [{ v: "230", l: "short right of the trap" }],
+      tags: ["Steep bowl", "Backstop"],
+      slope: null
+    },
+    {
+      n: 7,
+      par: 4, hcp: 3,
+      y: { back: [475, 437], mid: 366, fwd: 308 },
+      tee: "260+ to clear traps on left. Widest part of fairway is ~240 off the tee.",
+      app: "Room short, right or left only.",
+      grn: "Slopes back to front. False front.",
+      keys: [
+        { v: "240", l: "widest fairway" },
+        { v: "260+", l: "clears traps left" }
+      ],
+      tags: ["False front"],
+      slope: { deg: 270, label: "Back to front" }
+    },
+    {
+      n: 8,
+      par: 4, hcp: 15,
+      y: { back: 333, mid: 285, fwd: 218 },
+      tee: "200 to clear with straight shot, but anything left of center will funnel into trap.",
+      app: "If laying up, backstop is present.",
+      grn: "Room short (straight) or right (if laying up). Right to left slope if looking straight on. Room long as well.",
+      keys: [{ v: "200", l: "carry on the straight line" }],
+      tags: ["Backstop"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 9,
+      par: 5, hcp: 5,
+      y: { back: 618, mid: 593, fwd: 460 },
+      tee: "Massive ravine on left ~230 out. Widest fairway is 250 carry.",
+      app: "Ravine left of lefthand traps.",
+      grn: "Large kidney bean with small backstop and left punchbowl.",
+      keys: [
+        { v: "230", l: "ravine opens on the left" },
+        { v: "250", l: "widest fairway, carry" }
+      ],
+      tags: ["Kidney", "Backstop", "Punchbowl left"],
+      slope: null
+    },
+    {
+      n: 10,
+      par: 3, hcp: 14,
+      y: { back: 190, mid: 167, fwd: 95 },
+      tee: "",
+      app: "",
+      grn: "60 yard long donut, with trap in center. Lower half is severely left to right with multiple tiers. Upper half is also left to right, and a punchbowl. Trap long and left of center of green.",
+      keys: [{ v: "60 yds", l: "green, front to back" }],
+      tags: ["Donut", "Trap in center", "Multiple tiers"],
+      slope: { deg: 0, label: "Left to right", strong: true }
+    },
+    {
+      n: 11,
+      par: 4, hcp: 8,
+      y: { back: 443, mid: 398, fwd: 318 },
+      tee: "Widest part of fairway is over left corner of visible trap. 220–260 is safe. Beyond 260 funnels left below traps or into rough.",
+      app: "Room on right.",
+      grn: "Green slopes left to right and front to back.",
+      keys: [
+        { v: "220–260", l: "safe window" },
+        { v: "260+", l: "funnels left or into rough" }
+      ],
+      tags: [],
+      slope: { deg: 45, label: "Left to right, front to back" }
+    },
+    {
+      n: 12,
+      par: 5, hcp: 4,
+      y: { back: 572, mid: 536, fwd: 428 },
+      tee: "Widest part of fairway is 260.",
+      app: "Massive 60 yard long trap on right. Some safety left of green.",
+      grn: "Green slopes left to right.",
+      keys: [{ v: "260", l: "widest fairway" }],
+      tags: [],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 13,
+      par: 4, hcp: 12,
+      y: { back: 433, mid: 397, fwd: 267 },
+      tee: "Right side of trap offers best approach. Safest aim is right of trap, 235 shot. 280+ drive could roll into native.",
+      app: "Huge safety on right, drop off on left.",
+      grn: "Long but skinny. Relatively flat but slopes off on left side.",
+      keys: [
+        { v: "235", l: "right of the trap" },
+        { v: "280+", l: "rolls into native" }
+      ],
+      tags: ["Long and skinny"],
+      slope: { deg: 180, label: "Falls off left" }
+    },
+    {
+      n: 14,
+      par: 4, hcp: 2,
+      y: { back: 515, mid: 441, fwd: 352 },
+      tee: "Punchbowl.",
+      app: "Room long and left of green.",
+      grn: "Green slopes left to right and front to back. Flatter in center.",
+      keys: [],
+      tags: ["Flat center"],
+      slope: { deg: 45, label: "Left to right, front to back" }
+    },
+    {
+      n: 15,
+      par: 3, hcp: 18,
+      y: { back: 186, mid: 171, fwd: 102 },
+      tee: "Tons of room left, but slopes severely downhill. Some room right or short. Trap ends at the same distance as the center of the green.",
+      app: "",
+      grn: "Punchbowl. Slopes right to left.",
+      keys: [],
+      tags: ["Punchbowl"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 16,
+      par: 4, hcp: 16,
+      y: { back: [430, 400], mid: 382, fwd: 330 },
+      tee: "Massive punchbowl. Widest part of fairway is 230.",
+      app: "Plenty of room left and right. Punchbowl green.",
+      grn: "Front tier is higher than back. Left to right. Slight backstop.",
+      keys: [{ v: "230", l: "widest fairway" }],
+      tags: ["Front tier higher", "Slight backstop"],
+      slope: { deg: 45, label: "Left to right, front to back" }
+    },
+    {
+      n: 17,
+      par: 4, hcp: 10,
+      y: { back: 460, mid: 428, fwd: 324 },
+      tee: "Fairly flat, drops downhill after 260.",
+      app: "Room on right.",
+      grn: "Large right to left slope.",
+      keys: [{ v: "260", l: "starts downhill" }],
+      tags: [],
+      slope: { deg: 180, label: "Right to left", strong: true }
+    },
+    {
+      n: 18,
+      par: 5, hcp: 6,
+      y: { back: 500, mid: 428, fwd: 351 },
+      tee: "Punchbowl on right. Trap on left runs entire approach.",
+      app: "Room right, long or very short.",
+      grn: "Green slopes back to front and right to left.",
+      keys: [],
+      tags: [],
+      slope: { deg: 225, label: "Right to left, back to front" }
+    }
+  ];
+
+  var track = document.getElementById("track");
+  var holesRail = document.getElementById("holes");
+  var barFill = document.getElementById("bar-fill");
+  var prevBtn = document.getElementById("prev");
+  var nextBtn = document.getElementById("next");
+  var themeBtn = document.getElementById("theme-btn");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var BLOB = "M39 8 C55 8 70 20 70 38 C70 56 56 70 39 70 C22 70 8 57 8 39 C8 21 23 8 39 8 Z";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* A small plan view of the green: front edge nearest you at the
+     bottom, contour lines across the slope, arrow down the fall line. */
+  function slopeSVG(hole) {
+    var s = hole.slope;
+    if (!s) return "";
+    var rot = -s.deg;
+    var w = s.strong ? 3.6 : 2.5;
+    var id = "clip" + hole.n;
+    return '' +
+      '<div class="slope-wrap">' +
+        '<svg class="slope" viewBox="0 0 78 78" role="img" aria-label="Green falls ' + esc(s.label.toLowerCase()) + '">' +
+          '<defs><clipPath id="' + id + '"><path d="' + BLOB + '"/></clipPath></defs>' +
+          '<path class="blob" d="' + BLOB + '"/>' +
+          '<g class="cont" clip-path="url(#' + id + ')" transform="rotate(' + rot + ' 39 39)">' +
+            '<path d="M21 4 Q27 39 21 74"/>' +
+            '<path d="M35 2 Q41 39 35 76"/>' +
+            '<path d="M49 4 Q55 39 49 74"/>' +
+          '</g>' +
+          '<g class="arw" transform="rotate(' + rot + ' 39 39)" stroke-width="' + w + '">' +
+            '<path d="M21 39 H52"/>' +
+            '<path d="M44 31 L53 39 L44 47"/>' +
+          '</g>' +
+        '</svg>' +
+        '<div class="slope-cap">' + esc(s.label) + '</div>' +
+      '</div>';
+  }
+
+  function teecol(set, label) {
+    return '<button type="button" class="teecol" data-tee="' + set + '"' +
+           ' aria-pressed="false" aria-label="' + label + ' tees">' +
+           '<span class="tl">' + label + "</span>" +
+           '<span class="tv"></span></button>';
+  }
+
+  function block(cls, label, text, extra, emptyMsg) {
+    if (!text) {
+      return '<section class="blk ' + cls + ' empty"><h2>' + label + '</h2>' +
+             "<p>" + (emptyMsg || "No notes for this one.") + "</p></section>";
+    }
+    return '<section class="blk ' + cls + '"><h2>' + label + '</h2>' +
+           (extra || '<p>' + esc(text) + '</p>') + '</section>';
+  }
+
+  function pageHTML(hole, i) {
+    var keys = hole.keys.map(function (k) {
+      return '<div class="chip"><span class="v">' + esc(k.v) + '</span>' +
+             '<span class="l">' + esc(k.l) + '</span></div>';
+    }).join("");
+
+    var tags = hole.tags.map(function (t) {
+      return '<span class="tag">' + esc(t) + '</span>';
+    }).join("");
+
+    var greenInner = '<div class="green-row">' + slopeSVG(hole) +
+      '<div class="green-text"><p>' + esc(hole.grn) + '</p>' +
+      (tags ? '<div class="tags">' + tags + "</div>" : "") +
+      "</div></div>";
+
+    return '' +
+      '<article class="page" id="h' + hole.n + '" aria-label="Hole ' + hole.n + '">' +
+        '<div class="sheet">' +
+          '<div class="hole-head">' +
+            '<svg class="contour" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">' +
+              '<path d="M-10,74 C90,52 170,88 260,64 C330,45 370,66 410,54"/>' +
+              '<path d="M-10,56 C90,34 180,70 270,46 C340,27 375,48 410,36"/>' +
+              '<path d="M-10,38 C90,16 190,52 280,28 C350,9 380,30 410,18"/>' +
+            "</svg>" +
+            '<div class="num">' + hole.n + "</div>" +
+            '<div class="head-meta">' +
+              '<div class="eyebrow">' + (hole.n <= 9 ? "Front nine" : "Back nine") + "</div>" +
+              '<div class="of">Par ' + hole.par + " · Hcp " + hole.hcp + "</div>" +
+            "</div>" +
+            '<div class="head-stat">' +
+              teecol("back", "Back") + teecol("mid", "Mid") + teecol("fwd", "Fwd") +
+            "</div>" +
+          "</div>" +
+          (keys ? '<div class="chips">' + keys + "</div>" : "") +
+          block("tee", "Off the tee", hole.tee) +
+          block("app", "Approach", hole.app, null,
+                hole.par === 3 ? "Par 3 — the tee shot is the approach." : null) +
+          block("grn", "The green", hole.grn, greenInner) +
+        "</div>" +
+      "</article>";
+  }
+
+  track.innerHTML = HOLES.map(pageHTML).join("");
+
+  /* ---------- bottom rail ---------- */
+  HOLES.forEach(function (hole, i) {
+    if (i === 9) {
+      var turn = document.createElement("span");
+      turn.className = "turn";
+      turn.setAttribute("aria-hidden", "true");
+      holesRail.appendChild(turn);
+    }
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "pip";
+    b.textContent = hole.n;
+    b.setAttribute("aria-label", "Hole " + hole.n);
+    b.addEventListener("click", function () { goTo(i, true); });
+    holesRail.appendChild(b);
+  });
+  var pips = Array.prototype.slice.call(holesRail.querySelectorAll(".pip"));
+  var pages = Array.prototype.slice.call(track.querySelectorAll(".page"));
+
+  /* ---------- tee set ----------
+     Yardages and par are from the club scorecard. Holes 2, 7 and 16
+     have two back tee boxes, so those show both. */
+  var TEE_NAMES = { back: "Back", mid: "Middle", fwd: "Forward" };
+  var tee = "back";
+  try {
+    var savedTee = localStorage.getItem("dr-white-tee");
+    if (TEE_NAMES[savedTee]) tee = savedTee;
+  } catch (e) {}
+
+  function paintYardages() {
+    pages.forEach(function (page, i) {
+      var hole = HOLES[i];
+      Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
+        var set = col.getAttribute("data-tee");
+        var y = hole.y[set];
+        col.querySelector(".tv").innerHTML = Array.isArray(y)
+          ? y[0] + '<span class="alt">' + y[1] + "</span>"
+          : String(y);
+        col.setAttribute("aria-pressed", String(set === tee));
+      });
+    });
+  }
+
+  // Delegated: there are 54 of these, three on every hole card.
+  track.addEventListener("click", function (e) {
+    var col = e.target.closest && e.target.closest(".teecol");
+    if (!col) return;
+    tee = col.getAttribute("data-tee");
+    paintYardages();
+    try { localStorage.setItem("dr-white-tee", tee); } catch (err) {}
+  });
+
+  paintYardages();
+
+  /* ---------- navigation ---------- */
+  var current = -1;
+  var settling = null;      // hole we're animating toward, if any
+  var settleTimer;
+
+  function goTo(i, smooth) {
+    i = Math.max(0, Math.min(HOLES.length - 1, i));
+    var animate = smooth && !reduced && Math.abs(i - current) > 0;
+    if (animate) {
+      // Ignore the holes we sail past on the way, so only the
+      // destination plays its entrance.
+      settling = i;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { settling = null; }, 700);
+    }
+    track.scrollTo({
+      left: i * track.clientWidth,
+      behavior: animate ? "smooth" : "auto"
+    });
+    setCurrent(i);
+  }
+
+  function setCurrent(i) {
+    if (i === current) return;
+    current = i;
+
+    pips.forEach(function (p, n) {
+      if (n === i) { p.setAttribute("aria-current", "true"); }
+      else { p.removeAttribute("aria-current"); }
+    });
+    pages.forEach(function (p, n) { p.classList.toggle("is-active", n === i); });
+
+    barFill.style.width = ((i + 1) / HOLES.length) * 100 + "%";
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === HOLES.length - 1;
+
+    pips[i].scrollIntoView({ inline: "center", block: "nearest" });
+
+    try {
+      localStorage.setItem("dr-white-hole", String(HOLES[i].n));
+      history.replaceState(null, "", "#h" + HOLES[i].n);
+    } catch (e) { /* private mode — nav still works */ }
+  }
+
+  var ticking = false;
+  track.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var w = track.clientWidth;
+      if (w > 0) {
+        var i = Math.round(track.scrollLeft / w);
+        if (settling === null) {
+          setCurrent(i);
+        } else if (i === settling) {
+          settling = null;
+          clearTimeout(settleTimer);
+        }
+      }
+      ticking = false;
+    });
+  }, { passive: true });
+
+  prevBtn.addEventListener("click", function () { goTo(current - 1, true); });
+  nextBtn.addEventListener("click", function () { goTo(current + 1, true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowRight") { goTo(current + 1, true); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { goTo(current - 1, true); e.preventDefault(); }
+    else if (e.key === "Home") { goTo(0, true); e.preventDefault(); }
+    else if (e.key === "End") { goTo(HOLES.length - 1, true); e.preventDefault(); }
+  });
+
+  // Keep the current hole centered if the phone rotates.
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    var keep = current;
+    resizeTimer = setTimeout(function () {
+      track.scrollTo({ left: keep * track.clientWidth, behavior: "auto" });
+    }, 120);
+  });
+
+  /* ---------- daylight mode ---------- */
+  function applyTheme(mode) {
+    if (mode) { document.documentElement.setAttribute("data-theme", mode); }
+    else { document.documentElement.removeAttribute("data-theme"); }
+
+    var dark = mode
+      ? mode === "dark"
+      : !window.matchMedia("(prefers-color-scheme: light)").matches;
+
+    themeBtn.textContent = dark ? "☀" : "☾";
+    themeBtn.setAttribute("aria-label", dark ? "Switch to daylight mode" : "Switch to night mode");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#070E0B" : "#E7E4D8");
+  }
+
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("dr-white-theme"); } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeBtn.addEventListener("click", function () {
+    var isDark = themeBtn.textContent === "☀";
+    var next = isDark ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("dr-white-theme", next); } catch (e) {}
+  });
+
+  /* ---------- opening hole ---------- */
+  var start = 0;
+  var fromHash = /^#h(\d{1,2})$/.exec(location.hash);
+  if (fromHash) {
+    start = Math.max(0, Math.min(17, parseInt(fromHash[1], 10) - 1));
+  } else {
+    try {
+      var last = parseInt(localStorage.getItem("dr-white-hole"), 10);
+      if (last >= 1 && last <= 18) start = last - 1;
+    } catch (e) {}
+  }
+
+  // The track has no width until layout settles on some mobile browsers.
+  requestAnimationFrame(function () {
+    track.scrollTo({ left: start * track.clientWidth, behavior: "auto" });
+    current = -1;
+    setCurrent(start);
+  });
+
+  // The back link only makes sense next to the trip site's index.html.
+  if (/white-course\.html$/i.test(location.pathname)) {
+    document.getElementById("home-link").hidden = false;
+  }
+})();
+</script>
+</body>
+</html>
