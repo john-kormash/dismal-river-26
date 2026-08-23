@@ -82,6 +82,36 @@ cross-checked against every printed subtotal: OUT for all three tee sets (3,547 
 2,503), par 36, and stroke indexes 2–18 even each appearing once. All five checks pass, and
 the test asserts them against the rendered DOM rather than the source array.
 
+### Distances move with the tee
+
+Every distance in the notes was paced from the **White** tee, so White is the reference set
+and its cards read exactly as written. Pick Blue or Red and the tee-shot carries shift by the
+difference in hole length — hole 1 is 535 off Blue and 520 off White, so "220 to clear the
+right corner" becomes 235, and the block gets a `+15 yds vs White` badge. Shifted numbers are
+marked with a dotted underline so a derived carry never reads as a measured one.
+
+**Only tee-shot carries move.** Approach and green notes are never touched, and inside the
+tee note only the numbers wrapped in `{...}` shift. Everything left bare stays put, because
+it is anchored to something other than the tee box:
+
+| Left alone | Why |
+|---|---|
+| "70 yards from the center of the green" (1) | measured from the green |
+| "25 yards short of center" (5) | a spot on the ground, true from any tee |
+| "8–10 yards separate the visible traps" (8) | gap between two features |
+| "~40 yards long of center" (8) | measured from the green |
+| "15 yards lower than the tee" (6) | elevation |
+| "20 ft hill" (7) | elevation |
+
+So hole 5 shows identical numbers from all three tees, which is correct — it's a par 3 whose
+note is written against the green.
+
+The shift assumes the tee boxes sit back along the same line. That's the usual case but it
+isn't a survey: on a dogleg where the back tee is offset, or where the card's yardage follows
+a bend the tee shot doesn't, the derived carry will be a yard or three off. Treat White as
+gospel and the others as a good working estimate — which is what the dotted underline is
+there to say.
+
 Worth knowing if you ever extend this to the back nine: the Red card's **Blue tee has two
 configurations**, 6,994 and 6,897 yards, differing only on holes **13 (496/480), 17 (454/410)
 and 18 (447/410)** — 97 yards across the three. The front nine is identical in both, so the

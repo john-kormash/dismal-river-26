@@ -401,6 +401,26 @@
   .blk.empty{background:transparent;box-shadow:none;border-style:dashed}
   .blk.empty p{color:var(--muted);font-size:14px;font-style:italic}
 
+  /* A carry shifted off the White tee the notes were written from —
+     marked so a derived number never reads as a measured one. */
+  .adj{
+    font-weight:700;
+    color:var(--clay);
+    border-bottom:1px dotted var(--clay-line);
+  }
+  .blk h2 .from{
+    margin-left:8px;
+    padding:2px 7px;
+    border-radius:99px;
+    background:var(--clay-soft);
+    border:1px solid var(--clay-line);
+    color:var(--clay);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    white-space:nowrap;
+  }
+  .blk h2 .from[hidden]{display:none}
+
   /* ---------- green block ---------- */
   .green-row{display:flex;gap:14px;align-items:flex-start}
   .green-text{min-width:0;flex:1}
@@ -702,12 +722,12 @@
       n: 1,
       par: 5, hcp: 14,
       y: { blue: 535, white: 520, red: 446 },
-      tee: "220 to clear the right corner, fairway hill at 260. Bomb away.",
+      tee: "{220} to clear the right corner, fairway hill at {260}. Bomb away.",
       app: "Best layup lands you about 70 yards from the center of the green. Fairway plays uphill to the green. Some room long.",
       grn: "Two tiers with the front lower. Heavy right to left slope, slight front to back.",
       keys: [
-        { v: "220", l: "clears the right corner" },
-        { v: "260", l: "the fairway hill" },
+        { v: "{220}", l: "clears the right corner" },
+        { v: "{260}", l: "the fairway hill" },
         { v: "70 yds", l: "ideal layup, from center" }
       ],
       tags: ["Two tiers", "Front tier lower"],
@@ -717,11 +737,11 @@
       n: 2,
       par: 4, hcp: 2,
       y: { blue: 472, white: 430, red: 328 },
-      tee: "~250 to clear the corner of the traps on the left. Hole plays heavily uphill. Aim right of the trap on the left.",
+      tee: "~{250} to clear the corner of the traps on the left. Hole plays heavily uphill. Aim right of the trap on the left.",
       app: "Hidden ditch on the right — shots right of center funnel into it. Tons of room short and left of the green.",
       grn: "Humpback with a slight punchbowl on the back right.",
       keys: [
-        { v: "~250", l: "clears the trap corner, left" },
+        { v: "~{250}", l: "clears the trap corner, left" },
         { v: "Uphill", l: "heavily, the whole way" }
       ],
       tags: ["Humpback", "Punchbowl back right"],
@@ -742,13 +762,13 @@
       n: 4,
       par: 4, hcp: 10,
       y: { blue: 388, white: 354, red: 255 },
-      tee: "Widest landing is 240. Bunker is ~260. Clearing right of the bunker is ideal, but left of it will funnel back to the fairway. Right and 230 or less is the worst landing. Be at or left of the center trap.",
+      tee: "Widest landing is {240}. Bunker is ~{260}. Clearing right of the bunker is ideal, but left of it will funnel back to the fairway. Right and {230} or less is the worst landing. Be at or left of the center trap.",
       app: "Room straight or left, both long and short. Bunker on the back left corner of the green.",
       grn: "Heavy back to front break. Green dives off on the right side. Multiple tiers, and the front is lower.",
       keys: [
-        { v: "240", l: "widest landing" },
-        { v: "~260", l: "the bunker" },
-        { v: "≤230", l: "right side — worst landing" }
+        { v: "{240}", l: "widest landing" },
+        { v: "~{260}", l: "the bunker" },
+        { v: "≤{230}", l: "right side — worst landing" }
       ],
       tags: ["Multiple tiers", "Front tier lower", "Falls off right"],
       slope: { deg: 270, label: "Back to front", strong: true }
@@ -770,13 +790,13 @@
       n: 6,
       par: 4, hcp: 16,
       y: { blue: 326, white: 290, red: 224 },
-      tee: "230 to clear the little trap in the center. 230 hit directly at the dune right of the green — or between the dune and the little center trap — is ideal. Must clear 200 to avoid the lefthand slope into native. Dune is ~255 but sits 15 yards lower than the tee. Anything right of the dune will funnel massively downhill.",
+      tee: "{230} to clear the little trap in the center. {230} hit directly at the dune right of the green — or between the dune and the little center trap — is ideal. Must clear {200} to avoid the lefthand slope into native. Dune is ~{255} but sits 15 yards lower than the tee. Anything right of the dune will funnel massively downhill.",
       app: "Room on the right, left will funnel away. Hump on the right side may help anything right. Anything left of center will want to go in the trap.",
       grn: "",
       keys: [
-        { v: "230", l: "at the dune — the shot" },
-        { v: "200", l: "min carry, left slope into native" },
-        { v: "~255", l: "the dune, 15 yds below the tee" }
+        { v: "{230}", l: "at the dune — the shot" },
+        { v: "{200}", l: "min carry, left slope into native" },
+        { v: "~{255}", l: "the dune, 15 yds below the tee" }
       ],
       tags: [],
       slope: null
@@ -785,13 +805,13 @@
       n: 7,
       par: 4, hcp: 4,
       y: { blue: 442, white: 388, red: 279 },
-      tee: "240 shot is ideal. Tons of room left or right if you hit it 220–240. Aim just left of center of the visible trap. Balls left of the trap funnel down a 20 ft hill into safety. Native corner on the right starting at 250.",
+      tee: "{240} shot is ideal. Tons of room left or right if you hit it {220}–{240}. Aim just left of center of the visible trap. Balls left of the trap funnel down a 20 ft hill into safety. Native corner on the right starting at {250}.",
       app: "Room short right and long right. Shots left will funnel down. 50 yards of safety between the back of the trap and the center of the green.",
       grn: "Mostly back to front, with an upper tier on the top righthand side.",
       keys: [
-        { v: "240", l: "the shot" },
-        { v: "220–240", l: "room left and right" },
-        { v: "250", l: "native corner, right" }
+        { v: "{240}", l: "the shot" },
+        { v: "{220}–{240}", l: "room left and right" },
+        { v: "{250}", l: "native corner, right" }
       ],
       tags: ["Upper tier back right"],
       slope: { deg: 270, label: "Back to front" }
@@ -800,11 +820,11 @@
       n: 8,
       par: 5, hcp: 18,
       y: { blue: 554, white: 512, red: 445 },
-      tee: "Fairway widens at ~265 carry. Ideal is slightly left of the traps.",
+      tee: "Fairway widens at ~{265} carry. Ideal is slightly left of the traps.",
       app: "Ideal layup is just left of the trap, about 20 yards past it. Only 8–10 yards separate the visible traps. Don't be right. If going for the green, be short and left or long and right. Tons of room behind. Hidden trap ~40 yards long of center.",
       grn: "",
       keys: [
-        { v: "~265", l: "carry — fairway widens" },
+        { v: "~{265}", l: "carry — fairway widens" },
         { v: "8–10 yds", l: "gap between the visible traps" },
         { v: "~40 yds", l: "hidden trap, long of center" }
       ],
@@ -885,7 +905,7 @@
 
   function pageHTML(hole) {
     var keys = hole.keys.map(function (k) {
-      return '<div class="chip"><span class="v">' + esc(k.v) + "</span>" +
+      return '<div class="chip"><span class="v">' + renderNums(k.v, 0) + "</span>" +
              '<span class="l">' + esc(k.l) + "</span></div>";
     }).join("");
 
@@ -915,7 +935,8 @@
             teecol("red", "Red", "#C8635C") +
           "</div>" +
           (keys ? '<div class="chips">' + keys + "</div>" : "") +
-          block("tee", "Off the tee", hole.tee) +
+          block("tee", 'Off the tee<span class="from" hidden></span>', hole.tee,
+                "<p>" + renderNums(hole.tee, 0) + "</p>") +
           block("app", "Approach", hole.app, null,
                 hole.par === 3 ? "Par 3 — the tee shot is the approach."
                                : "No separate approach note — the tee line covers it.") +
@@ -946,19 +967,55 @@
      Note the forward tee is also called "Red" — that's the card's
      naming, not a typo for the course. */
   var TEE_NAMES = { blue: "Blue", white: "White", red: "Red" };
-  var tee = "blue";
+
+  // Every distance in the notes was paced from the White tee, so that's
+  // the set the numbers are written against. Pick another tee and the
+  // tee-shot carries shift by the difference in hole length.
+  var BASE_TEE = "white";
+  var tee = BASE_TEE;
   try {
     var savedTee = localStorage.getItem("dr-red-tee");
     if (TEE_NAMES[savedTee]) tee = savedTee;
   } catch (e) {}
 
+  /* Shift every {N} in the tee notes by the difference between the
+     chosen tee and the White tee the notes were written from. This
+     assumes the tee boxes sit back along the same line, which is the
+     usual case but not a survey — hence the marked-up numbers and the
+     badge on the block, so nobody mistakes a derived carry for a
+     measured one. Numbers anchored to the green, to another feature,
+     or to elevation are left bare in the source and never move. */
+  function renderNums(text, delta) {
+    return esc(text).replace(/\{(\d+)\}/g, function (_, n) {
+      var v = parseInt(n, 10) + delta;
+      return delta ? '<b class="adj">' + v + "</b>" : String(v);
+    });
+  }
+
   function paintYardages() {
     pages.forEach(function (page, i) {
       var hole = HOLES[i];
+      var delta = hole.y[tee] - hole.y[BASE_TEE];
+
       Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
         var set = col.getAttribute("data-tee");
         col.querySelector(".tv").textContent = String(hole.y[set]);
         col.setAttribute("aria-pressed", String(set === tee));
+      });
+
+      var p = page.querySelector(".blk.tee p");
+      if (p && hole.tee) p.innerHTML = renderNums(hole.tee, delta);
+
+      var badge = page.querySelector(".blk.tee .from");
+      if (badge) {
+        badge.textContent = (delta > 0 ? "+" : "−") + Math.abs(delta) +
+                            " yds vs " + TEE_NAMES[BASE_TEE];
+        badge.hidden = !delta;
+      }
+
+      var chips = page.querySelectorAll(".chip .v");
+      Array.prototype.forEach.call(chips, function (el, k) {
+        el.innerHTML = renderNums(hole.keys[k].v, delta);
       });
     });
   }
