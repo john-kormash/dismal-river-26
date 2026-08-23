@@ -10,7 +10,7 @@ A single-page site for the August 27–30, 2026 golf trip: Denver → Ogallala �
   or tiles from any CDN, so it still works once you're north of Ogallala with no bars.
 - `red-course.html` — the virtual caddy for the Red Course, front nine. Same idea, plus
   the tee view for every hole: tap the photo for full screen, pinch or double-tap to zoom
-  in on a bunker. The nine JPEGs are baked into the file as base64, so it is one 2 MB
+  in on a bunker. The nine JPEGs are baked into the file as base64, so it is one 5.7 MB
   file with **zero** network requests. Generated — see below.
 
 ## Run it locally
@@ -60,15 +60,25 @@ pip install pillow
 python build-red-course.py
 ```
 
-The script encodes `Course Images/Red/DismalRed_1..9.png` as base64 JPEGs (quality 86,
-~200 KB each) and drops them into the template's `/*__PHOTOS__*/` marker. The notes live
+The script encodes `Course Images/Red/DismalRed_1..9.png` as base64 JPEGs and drops them
+into the template's `/*__PHOTOS__*/` marker. It **upscales them 2x with Lanczos and applies
+an unsharp mask first** — see `UPSCALE` / `SHARPEN_*` in the script. The originals are only
+1337x827 and soft, so at native size a phone renders them at roughly 1:1 and every soft pixel
+shows, while a desktop downsamples 2x and hides it. That's why they looked fine on one and
+muddy on the other. Upscaling here rather than letting the browser's bilinear filter do it
+when you pinch is a visible improvement, and it costs only file size (~640 KB per hole at
+quality 78, ~5.7 MB for the page). If you ever get higher-resolution renders, set `UPSCALE = 1`
+and drop `SHARPEN_PERCENT` toward 0 — sharp input doesn't want any of this.
+
+The notes live
 in the `HOLES` array near the top of the template's `<script>`; everything below the
 PHOTOS banner is machine-written. Fields are the same as the White book's `HOLES`
 (`tee` / `app` / `grn` / `keys` / `tags` / `slope`) minus `par`, `hcp` and `y` — the club's
 Red scorecard isn't transcribed per hole yet, so the cards carry notes and photos only.
 
-Only the current hole and its two neighbours hold a decoded photo at a time; the rest
-have their `src` dropped, which keeps memory sane on an older phone.
+Only the current hole and the one either side of it hold a decoded photo at a time; the rest
+have their `src` dropped. At 2674x1654 each decoded frame is ~18 MB, so this matters — nine
+at once would be ~160 MB.
 
 ### The White Course book
 

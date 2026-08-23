@@ -23,24 +23,34 @@ TEMPLATE = ROOT / "red-course.template.html"
 OUTPUT = ROOT / "red-course.html"
 
 HOLES = range(1, 10)
-MAX_WIDTH = 1400   # the source renders are ~1337 wide; leave them alone
-QUALITY = 86       # measured at 39 dB PSNR — the encode is not the weak link
 
-# The renders are only 1.1 MP and soft to begin with, so double-tapping
-# to 2.6x on a 3x phone upscales well past native and turns to mush.
-# An unsharp mask before encoding puts the bunker edges and fence lines
-# back. Drop PERCENT toward 0 if you ever re-export the source larger —
-# sharp input does not want this.
-SHARPEN_RADIUS = 1.6
-SHARPEN_PERCENT = 95
+# The source renders are only 1337x827 and soft, and there are no
+# higher-resolution originals to go back to. Two things follow.
+#
+# Upscaling here rather than in the browser: when you pinch past the
+# source resolution, *something* has to invent the pixels. Chrome and
+# Safari use a cheap bilinear/bicubic filter and the result is mush.
+# Lanczos plus an unsharp pass at the larger size measurably beats it,
+# and it costs only file size. 2x also means the card view downsamples
+# 2.5x on a phone instead of rendering near-native, which is what made
+# the photos look soft on mobile but fine on a desktop.
+#
+# Quality 78 rather than 86: an upscaled image is smooth, so JPEG has an
+# easy job. At 2x the two are indistinguishable at 1:1 and q78 saves
+# 1.3 MB across the nine holes.
+UPSCALE = 2
+QUALITY = 78
+
+SHARPEN_RADIUS = 2.2
+SHARPEN_PERCENT = 110
 SHARPEN_THRESHOLD = 2
 
 
 def encode(path: Path) -> str:
     img = Image.open(path).convert("RGB")
-    if img.width > MAX_WIDTH:
+    if UPSCALE != 1:
         img = img.resize(
-            (MAX_WIDTH, round(img.height * MAX_WIDTH / img.width)),
+            (round(img.width * UPSCALE), round(img.height * UPSCALE)),
             Image.LANCZOS,
         )
     if SHARPEN_PERCENT:

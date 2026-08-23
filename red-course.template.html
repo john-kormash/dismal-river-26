@@ -863,12 +863,14 @@
   var pips = Array.prototype.slice.call(holesRail.querySelectorAll(".pip"));
 
   /* ---------- photos ----------
-     Every JPEG is already in the file, but decoding nine of them at
-     once is a lot to ask of a phone. Only the current hole and its
-     neighbours get a src; the rest are dropped again. */
+     Every JPEG is already in the file, but these are 2674x1654 —
+     about 18 MB each once decoded — so nine at a time would be a lot
+     to ask of a phone. Only the current hole and the one either side
+     of it get a src; the rest are dropped again. The lightbox reuses
+     whatever the current card already decoded. */
   function hydrate(i) {
     shots.forEach(function (img, n) {
-      var near = Math.abs(n - i) <= 2;
+      var near = Math.abs(n - i) <= 1;
       if (near && !img.src) {
         img.addEventListener("load", function () { img.classList.add("ready"); }, { once: true });
         img.src = PHOTOS[HOLES[n].n];
