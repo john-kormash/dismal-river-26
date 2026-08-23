@@ -72,9 +72,20 @@ and drop `SHARPEN_PERCENT` toward 0 — sharp input doesn't want any of this.
 
 The notes live
 in the `HOLES` array near the top of the template's `<script>`; everything below the
-PHOTOS banner is machine-written. Fields are the same as the White book's `HOLES`
-(`tee` / `app` / `grn` / `keys` / `tags` / `slope`) minus `par`, `hcp` and `y` — the club's
-Red scorecard isn't transcribed per hole yet, so the cards carry notes and photos only.
+PHOTOS banner is machine-written. Fields match the White book's `HOLES` — `par`, `hcp`,
+`y`, `tee`, `app`, `grn`, `keys`, `tags`, `slope` — except that `y` is keyed
+`{ blue, white, red }`, since the Red card names its tees Blue / White / Red. (The forward
+tee really is called "Red" on the Red Course; that's the card's naming, not a typo.)
+
+Per-hole par, stroke index and yardages are transcribed from the Red scorecard PDF and
+cross-checked against every printed subtotal: OUT for all three tee sets (3,547 / 3,264 /
+2,503), par 36, and stroke indexes 2–18 even each appearing once. All five checks pass, and
+the test asserts them against the rendered DOM rather than the source array.
+
+Worth knowing if you ever extend this to the back nine: the Red card's **Blue tee has two
+configurations**, 6,994 and 6,897 yards, differing only on holes **13 (496/480), 17 (454/410)
+and 18 (447/410)** — 97 yards across the three. The front nine is identical in both, so the
+caddy is unaffected. The site quotes 6,994, which is the longer one.
 
 Only the current hole and the one either side of it hold a decoded photo at a time; the rest
 have their `src` dropped. At 2674x1654 each decoded frame is ~18 MB, so this matters — nine

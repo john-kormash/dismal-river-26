@@ -289,6 +289,52 @@
   }
   .shot:hover .shot-zoom{background:rgba(10,8,7,.72)}
 
+  /* ---------- tee yardages ----------
+     All three sets stay on the page; tapping one just marks it as
+     yours, because somebody always plays a different tee. */
+  .tees{display:flex;gap:6px}
+  .teecol{
+    flex:1 1 0;
+    min-width:0;
+    appearance:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    padding:7px 6px 8px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:var(--surface);
+    font-family:inherit;
+    cursor:pointer;
+    transition:background .16s,border-color .16s;
+  }
+  .teecol .dot{
+    width:7px;
+    height:7px;
+    border-radius:99px;
+    box-shadow:0 0 0 1px var(--line-2);
+  }
+  .teecol .tl{
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .teecol .tv{
+    font-family:var(--mono);
+    font-size:17px;
+    font-weight:700;
+    line-height:1.05;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .teecol:hover{background:var(--surface-2)}
+  .teecol[aria-pressed="true"]{border-color:var(--clay-line);background:var(--clay-soft)}
+  .teecol[aria-pressed="true"] .tl{color:var(--clay)}
+  .teecol[aria-pressed="true"] .tv{color:var(--ink)}
+
   /* ---------- carry chips ---------- */
   .chips{display:flex;flex-wrap:wrap;gap:7px}
   .chip{
@@ -654,6 +700,8 @@
   var HOLES = [
     {
       n: 1,
+      par: 5, hcp: 14,
+      y: { blue: 535, white: 520, red: 446 },
       tee: "220 to clear the right corner, fairway hill at 260. Bomb away.",
       app: "Best layup lands you about 70 yards from the center of the green. Fairway plays uphill to the green. Some room long.",
       grn: "Two tiers with the front lower. Heavy right to left slope, slight front to back.",
@@ -667,6 +715,8 @@
     },
     {
       n: 2,
+      par: 4, hcp: 2,
+      y: { blue: 472, white: 430, red: 328 },
       tee: "~250 to clear the corner of the traps on the left. Hole plays heavily uphill. Aim right of the trap on the left.",
       app: "Hidden ditch on the right — shots right of center funnel into it. Tons of room short and left of the green.",
       grn: "Humpback with a slight punchbowl on the back right.",
@@ -679,6 +729,8 @@
     },
     {
       n: 3,
+      par: 3, hcp: 8,
+      y: { blue: 195, white: 163, red: 128 },
       tee: "Tons of room short and left. Also room long right and long left.",
       app: "Massive false front.",
       grn: "Slight right to left.",
@@ -688,6 +740,8 @@
     },
     {
       n: 4,
+      par: 4, hcp: 10,
+      y: { blue: 388, white: 354, red: 255 },
       tee: "Widest landing is 240. Bunker is ~260. Clearing right of the bunker is ideal, but left of it will funnel back to the fairway. Right and 230 or less is the worst landing. Be at or left of the center trap.",
       app: "Room straight or left, both long and short. Bunker on the back left corner of the green.",
       grn: "Heavy back to front break. Green dives off on the right side. Multiple tiers, and the front is lower.",
@@ -701,6 +755,8 @@
     },
     {
       n: 5,
+      par: 3, hcp: 6,
+      y: { blue: 261, white: 239, red: 167 },
       tee: "Tons of room short left, or right of the green. Must clear 25 yards short of center if going over the trap.",
       app: "",
       grn: "Back punchbowl. Predominant right to left break.",
@@ -712,6 +768,8 @@
     },
     {
       n: 6,
+      par: 4, hcp: 16,
+      y: { blue: 326, white: 290, red: 224 },
       tee: "230 to clear the little trap in the center. 230 hit directly at the dune right of the green — or between the dune and the little center trap — is ideal. Must clear 200 to avoid the lefthand slope into native. Dune is ~255 but sits 15 yards lower than the tee. Anything right of the dune will funnel massively downhill.",
       app: "Room on the right, left will funnel away. Hump on the right side may help anything right. Anything left of center will want to go in the trap.",
       grn: "",
@@ -725,6 +783,8 @@
     },
     {
       n: 7,
+      par: 4, hcp: 4,
+      y: { blue: 442, white: 388, red: 279 },
       tee: "240 shot is ideal. Tons of room left or right if you hit it 220–240. Aim just left of center of the visible trap. Balls left of the trap funnel down a 20 ft hill into safety. Native corner on the right starting at 250.",
       app: "Room short right and long right. Shots left will funnel down. 50 yards of safety between the back of the trap and the center of the green.",
       grn: "Mostly back to front, with an upper tier on the top righthand side.",
@@ -738,6 +798,8 @@
     },
     {
       n: 8,
+      par: 5, hcp: 18,
+      y: { blue: 554, white: 512, red: 445 },
       tee: "Fairway widens at ~265 carry. Ideal is slightly left of the traps.",
       app: "Ideal layup is just left of the trap, about 20 yards past it. Only 8–10 yards separate the visible traps. Don't be right. If going for the green, be short and left or long and right. Tons of room behind. Hidden trap ~40 yards long of center.",
       grn: "",
@@ -751,6 +813,8 @@
     },
     {
       n: 9,
+      par: 4, hcp: 12,
+      y: { blue: 374, white: 368, red: 231 },
       tee: "Massive ravines on the right. Left is better and the fairway is wide.",
       app: "Plenty of room short, or long. Long rolls toward native. Do not be left of the green.",
       grn: "Long but skinny. Minimal break.",
@@ -802,6 +866,14 @@
       '</div>';
   }
 
+  function teecol(set, label, swatch) {
+    return '<button type="button" class="teecol" data-tee="' + set + '"' +
+           ' aria-pressed="false" aria-label="' + label + ' tees">' +
+           '<span class="dot" style="background:' + swatch + '"></span>' +
+           '<span class="tl">' + label + "</span>" +
+           '<span class="tv"></span></button>';
+  }
+
   function block(cls, label, text, extra, emptyMsg) {
     if (!text) {
       return '<section class="blk ' + cls + ' empty"><h2>' + label + '</h2>' +
@@ -833,13 +905,20 @@
                  ' aria-label="Hole ' + hole.n + ' from the tee — tap to zoom">' +
             '<img class="shot-img" alt="" />' +
             '<span class="shot-scrim"></span>' +
-            '<span class="shot-tag">Tee view</span>' +
+            '<span class="shot-tag">Par ' + hole.par + " · Hcp " + hole.hcp + "</span>" +
             '<span class="shot-num">' + hole.n + "</span>" +
             '<span class="shot-zoom" aria-hidden="true">⤢</span>' +
           "</button>" +
+          '<div class="tees">' +
+            teecol("blue", "Blue", "#4A7FD4") +
+            teecol("white", "White", "#EFEBE0") +
+            teecol("red", "Red", "#C8635C") +
+          "</div>" +
           (keys ? '<div class="chips">' + keys + "</div>" : "") +
           block("tee", "Off the tee", hole.tee) +
-          block("app", "Approach", hole.app, null, "No separate approach note — the tee line covers it.") +
+          block("app", "Approach", hole.app, null,
+                hole.par === 3 ? "Par 3 — the tee shot is the approach."
+                               : "No separate approach note — the tee line covers it.") +
           block("grn", "The green", hole.grn, greenInner, "No green notes for this one.") +
         "</div>" +
       "</article>";
@@ -861,6 +940,39 @@
     holesRail.appendChild(b);
   });
   var pips = Array.prototype.slice.call(holesRail.querySelectorAll(".pip"));
+
+  /* ---------- tee set ----------
+     Yardages, par and stroke index come from the club's Red scorecard.
+     Note the forward tee is also called "Red" — that's the card's
+     naming, not a typo for the course. */
+  var TEE_NAMES = { blue: "Blue", white: "White", red: "Red" };
+  var tee = "blue";
+  try {
+    var savedTee = localStorage.getItem("dr-red-tee");
+    if (TEE_NAMES[savedTee]) tee = savedTee;
+  } catch (e) {}
+
+  function paintYardages() {
+    pages.forEach(function (page, i) {
+      var hole = HOLES[i];
+      Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
+        var set = col.getAttribute("data-tee");
+        col.querySelector(".tv").textContent = String(hole.y[set]);
+        col.setAttribute("aria-pressed", String(set === tee));
+      });
+    });
+  }
+
+  // Delegated: there are 27 of these, three on every hole card.
+  track.addEventListener("click", function (e) {
+    var col = e.target.closest && e.target.closest(".teecol");
+    if (!col) return;
+    tee = col.getAttribute("data-tee");
+    paintYardages();
+    try { localStorage.setItem("dr-red-tee", tee); } catch (err) {}
+  });
+
+  paintYardages();
 
   /* ---------- photos ----------
      Every JPEG is already in the file, but these are 2674x1654 —
