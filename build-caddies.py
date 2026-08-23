@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Bake the Red Course caddy into one offline HTML file.
+"""Bake the on-course caddies into single offline HTML files.
 
-Reads red-course.template.html, encodes every tee view in
-Course Images/Red/ as a base64 JPEG, and writes red-course.html.
+For each course, reads its template, encodes every tee view in
+Course Images/<Course>/ as a base64 JPEG, and writes the caddy.
 
-    python build-red-course.py
+    python build-caddies.py            # both courses
+    python build-caddies.py red        # just one
 
 Requires Pillow.  Edit the notes in the template, not in the
 generated file — the generated file gets overwritten.
@@ -18,9 +19,21 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parent
-IMAGES = ROOT / "Course Images" / "Red"
-TEMPLATE = ROOT / "red-course.template.html"
-OUTPUT = ROOT / "red-course.html"
+
+COURSES = {
+    "red": {
+        "images": ROOT / "Course Images" / "Red",
+        "prefix": "DismalRed",
+        "template": ROOT / "red-course.template.html",
+        "output": ROOT / "red-course.html",
+    },
+    "white": {
+        "images": ROOT / "Course Images" / "White",
+        "prefix": "DismalWhite",
+        "template": ROOT / "white-course.template.html",
+        "output": ROOT / "white-course.html",
+    },
+}
 
 HOLES = range(1, 19)
 
@@ -75,16 +88,18 @@ def encode(path: Path):
     return base64.b64encode(buf.getvalue()).decode("ascii"), img.width, img.height
 
 
-def main() -> int:
-    if not TEMPLATE.exists():
-        print(f"missing template: {TEMPLATE}", file=sys.stderr)
+def build(name: str, cfg: dict) -> int:
+    template, images, output = cfg["template"], cfg["images"], cfg["output"]
+    if not template.exists():
+        print(f"missing template: {template}", file=sys.stderr)
         return 1
 
+    print(f"\n=== {name} ===")
     photos = ["var PHOTOS = {"]
     sizes = []
     total = 0
     for n in HOLES:
-        src = IMAGES / f"DismalRed_{n}.png"
+        src = images / f"{cfg['prefix']}_{n}.png"
         if not src.exists():
             print(f"missing image: {src}", file=sys.stderr)
             return 1
@@ -95,7 +110,7 @@ def main() -> int:
         sizes.append(f"{n}: [{w}, {h}]")
     photos.append("  };")
 
-    html = TEMPLATE.read_text(encoding="utf-8")
+    html = template.read_text(encoding="utf-8")
     for marker in ("/*__PHOTOS__*/", "/*__SIZES__*/"):
         if marker not in html:
             print(f"template has no {marker} marker", file=sys.stderr)
@@ -106,10 +121,23 @@ def main() -> int:
     # nothing jumps around as you swipe.
     html = html.replace("/*__SIZES__*/", "var SIZES = { " + ", ".join(sizes) + " };")
     html = html.replace("/*__PHOTOS__*/", "\n".join(photos))
-    OUTPUT.write_text(html, encoding="utf-8")
+    output.write_text(html, encoding="utf-8")
 
-    print(f"\nwrote {OUTPUT.name} — {OUTPUT.stat().st_size / 1024 / 1024:.2f} MB "
+    print(f"wrote {output.name} — {output.stat().st_size / 1024 / 1024:.2f} MB "
           f"({total / 1024 / 1024:.2f} MB of it photos)")
+    return 0
+
+
+def main() -> int:
+    wanted = sys.argv[1:] or list(COURSES)
+    for name in wanted:
+        if name not in COURSES:
+            print(f"unknown course: {name} (have {', '.join(COURSES)})", file=sys.stderr)
+            return 1
+    for name in wanted:
+        rc = build(name, COURSES[name])
+        if rc:
+            return rc
     return 0
 
 

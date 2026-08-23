@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>White Course Caddy</title>
+<meta name="description" content="Tee views and hole-by-hole caddy notes for the Nicklaus White Course at Dismal River Club. One hole per screen, works with no signal." />
+<meta name="theme-color" content="#070E0B" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="White Caddy" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23070E0B'/><path d='M38 78 V24' stroke='%23EAF2ED' stroke-width='6' stroke-linecap='round'/><path d='M41 26 L74 36 L41 46 Z' fill='%23E3B84F'/></svg>" />
+
+<style>
+  /* ============================================================
+     TOKENS — the same system as the Red caddy, in the White
+     course's own green-black: gold off the tee, gold on the
+     approach, green on the green. Dark is the default; "Daylight"
+     is the light set, for reading the screen in open sun.
+     ============================================================ */
+  :root{
+    color-scheme:dark;
+    --bg:#070E0B;
+    --bg-2:#0A1611;
+    --card:#0D1D16;
+    --surface:rgba(255,255,255,.05);
+    --surface-2:rgba(255,255,255,.09);
+    --line:rgba(255,255,255,.10);
+    --line-2:rgba(255,255,255,.22);
+    --ink:#EAF2ED;
+    --muted:#8CA398;
+    --accent:#E3B84F;
+    --accent-soft:rgba(227,184,79,.13);
+    --accent-line:rgba(227,184,79,.34);
+    --gold:#E3B84F;
+    --gold-soft:rgba(227,184,79,.13);
+    --gold-line:rgba(227,184,79,.34);
+    --green:#3FCF8E;
+    --green-soft:rgba(63,207,142,.12);
+    --green-line:rgba(63,207,142,.32);
+    --on-accent:#08130E;
+    --shadow:0 18px 44px -26px rgba(0,0,0,.95);
+
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+
+  @media (prefers-color-scheme:light){
+    :root:not([data-theme="dark"]){
+      color-scheme:light;
+      --bg:#E7E4D8;
+      --bg-2:#EDEAE0;
+      --card:#FBFAF5;
+      --surface:rgba(11,22,17,.035);
+      --surface-2:rgba(11,22,17,.065);
+      --line:rgba(11,22,17,.15);
+      --line-2:rgba(11,22,17,.30);
+      --ink:#0B1611;
+      --muted:#4C5F55;
+      --accent:#8A6714;
+      --accent-soft:rgba(138,103,20,.11);
+      --accent-line:rgba(138,103,20,.32);
+      --gold:#8A6714;
+      --gold-soft:rgba(138,103,20,.11);
+      --gold-line:rgba(138,103,20,.34);
+      --green:#0E6B45;
+      --green-soft:rgba(14,107,69,.10);
+      --green-line:rgba(14,107,69,.30);
+      --on-accent:#FBFAF5;
+      --shadow:0 14px 32px -22px rgba(11,22,17,.55);
+    }
+  }
+
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#E7E4D8;
+    --bg-2:#EDEAE0;
+    --card:#FBFAF5;
+    --surface:rgba(11,22,17,.035);
+    --surface-2:rgba(11,22,17,.065);
+    --line:rgba(11,22,17,.15);
+    --line-2:rgba(11,22,17,.30);
+    --ink:#0B1611;
+    --muted:#4C5F55;
+    --accent:#8A6714;
+    --accent-soft:rgba(138,103,20,.11);
+    --accent-line:rgba(138,103,20,.32);
+    --gold:#8A6714;
+    --gold-soft:rgba(138,103,20,.11);
+    --gold-line:rgba(138,103,20,.34);
+    --green:#0E6B45;
+    --green-soft:rgba(14,107,69,.10);
+    --green-line:rgba(14,107,69,.30);
+    --on-accent:#FBFAF5;
+    --shadow:0 14px 32px -22px rgba(11,22,17,.55);
+  }
+
+  /* ============================================================
+     FRAME
+     ============================================================ */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+    overflow:hidden;
+  }
+  ::selection{background:var(--accent);color:#fff}
+
+  .book{
+    position:fixed;
+    inset:0;
+    display:grid;
+    /* minmax(0,1fr): without it the rail's min-content width would
+       push the whole column past the edge of the phone. */
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto 1fr auto;
+    background:var(--bg);
+  }
+
+  /* ---------- top bar ---------- */
+  .bar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+    background:var(--bg-2);
+    border-bottom:1px solid var(--line);
+  }
+  .flag{width:15px;height:20px;flex:none;display:block}
+  .flag .pole{stroke:var(--ink);stroke-width:2.4;stroke-linecap:round}
+  .flag .cloth{fill:var(--accent)}
+  .wordmark{
+    font-size:11px;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .wordmark b{color:var(--ink);font-weight:600}
+  .bar-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .icon-btn{
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:15px;
+    line-height:1;
+    text-decoration:none;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .18s,color .18s,border-color .18s;
+  }
+  .icon-btn:hover{color:var(--ink);border-color:var(--line-2)}
+  .icon-btn[hidden]{display:none}
+
+  /* ---------- progress ---------- */
+  .progress{height:2px;background:var(--surface-2);overflow:hidden}
+  .progress i{
+    display:block;
+    height:100%;
+    width:5.5%;
+    background:linear-gradient(90deg,var(--accent),var(--gold));
+    transition:width .32s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ---------- flip track ---------- */
+  .track{
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .track::-webkit-scrollbar{display:none}
+
+  .page{
+    flex:0 0 100%;
+    width:100%;
+    min-width:0;
+    scroll-snap-align:center;
+    scroll-snap-stop:always;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    scrollbar-width:none;
+  }
+  .page::-webkit-scrollbar{display:none}
+
+  .sheet{
+    max-width:640px;
+    margin-inline:auto;
+    padding:13px 14px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  /* ---------- the photo ---------- */
+  .shot{
+    position:relative;
+    display:block;
+    width:100%;
+    padding:0;
+    margin:0;
+    border:1px solid var(--line);
+    border-radius:15px;
+    overflow:hidden;
+    background:linear-gradient(160deg,#2A211C,#141010);
+    aspect-ratio:1337/827;   /* overridden per hole from SIZES */
+    max-height:min(42vh,340px);
+    cursor:zoom-in;
+    box-shadow:var(--shadow);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .shot-img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .shot-img.ready{opacity:1}
+  .shot-scrim{
+    position:absolute;
+    inset:auto 0 0 0;
+    height:58%;
+    background:linear-gradient(to top,rgba(6,5,4,.82),rgba(6,5,4,.35) 42%,transparent);
+    pointer-events:none;
+  }
+  .shot-num{
+    position:absolute;
+    left:14px;
+    bottom:6px;
+    font-family:var(--serif);
+    font-size:54px;
+    line-height:1;
+    color:#F7F2EA;
+    font-variant-numeric:lining-nums tabular-nums;
+    letter-spacing:-.03em;
+    text-shadow:0 2px 18px rgba(0,0,0,.75);
+    pointer-events:none;
+  }
+  .shot-tag{
+    position:absolute;
+    left:15px;
+    bottom:calc(6px + 54px);
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.72);
+    text-shadow:0 1px 10px rgba(0,0,0,.8);
+    pointer-events:none;
+  }
+  .shot-zoom{
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    display:grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    background:rgba(10,8,7,.5);
+    border:1px solid rgba(255,255,255,.2);
+    color:#F7F2EA;
+    font-size:14px;
+    line-height:1;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    pointer-events:none;
+  }
+  .shot:hover .shot-zoom{background:rgba(10,8,7,.72)}
+
+  /* ---------- tee yardages ----------
+     All three sets stay on the page; tapping one just marks it as
+     yours, because somebody always plays a different tee. */
+  .tees{display:flex;gap:6px}
+  .teecol{
+    flex:1 1 0;
+    min-width:0;
+    appearance:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    padding:7px 6px 8px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:var(--surface);
+    font-family:inherit;
+    cursor:pointer;
+    transition:background .16s,border-color .16s;
+  }
+  .teecol .dot{
+    width:7px;
+    height:7px;
+    border-radius:99px;
+    box-shadow:0 0 0 1px var(--line-2);
+  }
+  .teecol .tl{
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .teecol .tv{
+    font-family:var(--mono);
+    font-size:17px;
+    font-weight:700;
+    line-height:1.05;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  /* Holes 2, 7 and 16 have two Back tee boxes. Both stay on screen. */
+  .teecol .tv .alt{display:block;font-size:11px;font-weight:600;opacity:.7}
+  .teecol:hover{background:var(--surface-2)}
+  .teecol[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-soft)}
+  .teecol[aria-pressed="true"] .tl{color:var(--accent)}
+  .teecol[aria-pressed="true"] .tv{color:var(--ink)}
+
+  /* ---------- carry chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:7px 11px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+  }
+  .chip .v{
+    font-family:var(--mono);
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .chip .l{
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:.01em;
+  }
+
+  /* ---------- strategy blocks ---------- */
+  .blk{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:13px 16px 14px 17px;
+    box-shadow:var(--shadow);
+  }
+  .blk::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:13px;
+    bottom:13px;
+    width:3px;
+    border-radius:0 3px 3px 0;
+    background:var(--rail,var(--line-2));
+  }
+  .blk h2{
+    margin:0 0 6px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--rail,var(--muted));
+  }
+  .blk p{
+    margin:0;
+    font-size:16.5px;
+    line-height:1.46;
+    color:var(--ink);
+    text-wrap:pretty;
+  }
+  .blk.tee{--rail:var(--accent)}
+  .blk.app{--rail:var(--gold)}
+  .blk.grn{--rail:var(--green)}
+
+  .blk.empty{background:transparent;box-shadow:none;border-style:dashed}
+  .blk.empty p{color:var(--muted);font-size:14px;font-style:italic}
+
+  /* A carry shifted off the White tee the notes were written from —
+     marked so a derived number never reads as a measured one. */
+  .adj{
+    font-weight:700;
+    color:var(--accent);
+    border-bottom:1px dotted var(--accent-line);
+  }
+  .blk h2 .from{
+    margin-left:8px;
+    padding:2px 7px;
+    border-radius:99px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+    color:var(--accent);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    white-space:nowrap;
+  }
+  .blk h2 .from[hidden]{display:none}
+
+  /* When a hole's notes were paced against a yardage that isn't on the
+     card, say so on the card rather than quietly reconciling it. */
+  .blk .caveat{
+    margin-top:10px;
+    padding-top:9px;
+    border-top:1px dashed var(--line-2);
+    font-size:12.5px;
+    line-height:1.4;
+    color:var(--muted);
+  }
+
+  /* ---------- green block ---------- */
+  .green-row{display:flex;gap:14px;align-items:flex-start}
+  .green-text{min-width:0;flex:1}
+  .slope-wrap{flex:none;width:74px;text-align:center}
+  .slope{display:block;width:74px;height:74px}
+  .slope .blob{fill:var(--surface-2);stroke:var(--line-2);stroke-width:1.4}
+  .slope .cont path{fill:none;stroke:var(--muted);stroke-width:1;opacity:.4}
+  .slope .arw path{fill:none;stroke:var(--green);stroke-linecap:round;stroke-linejoin:round}
+  .slope-cap{
+    margin-top:5px;
+    font-size:10px;
+    line-height:1.25;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .tag{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.04em;
+    padding:4px 9px;
+    border-radius:99px;
+    color:var(--green);
+    background:var(--green-soft);
+    border:1px solid var(--green-line);
+  }
+
+  /* ---------- bottom rail ---------- */
+  .rail{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 8px calc(9px + env(safe-area-inset-bottom));
+    background:var(--bg-2);
+    border-top:1px solid var(--line);
+  }
+  .step{
+    flex:none;
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    font-size:17px;
+    line-height:1;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .step:disabled{opacity:.3;cursor:default}
+  .holes{
+    flex:1;
+    min-width:0;
+    display:flex;
+    gap:4px;
+    align-items:center;
+    /* flex-start, not center: centred flex content that overflows
+       makes the first pip unreachable in a scroll container. */
+    justify-content:flex-start;
+    overflow-x:auto;
+    scrollbar-width:none;
+    scroll-behavior:smooth;
+    padding:2px;
+  }
+  .holes::-webkit-scrollbar{display:none}
+  .pip{
+    flex:none;
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+    padding:0;
+    transition:background .16s,color .16s,border-color .16s;
+  }
+  .turn{
+    flex:none;
+    width:1px;
+    height:20px;
+    background:var(--line-2);
+    margin:0 4px;
+  }
+  .pip:hover{color:var(--ink);border-color:var(--line-2)}
+  .pip[aria-current="true"]{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ============================================================
+     LIGHTBOX — the photo, full screen, pinch or double-tap to
+     zoom. Swipe sideways for the next hole, down to dismiss.
+     ============================================================ */
+  .lb{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    background:#070605;
+    animation:fade .18s ease both;
+  }
+  .lb[hidden]{display:none}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .lb-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:calc(10px + env(safe-area-inset-top)) 12px 10px;
+    color:#F2EDE6;
+  }
+  .lb-title{
+    font-size:11px;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+    color:rgba(242,237,230,.7);
+  }
+  .lb-title b{color:#F2EDE6;font-weight:600}
+  .lb-bar .icon-btn{
+    margin-left:auto;
+    border-color:rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    color:#F2EDE6;
+  }
+
+  .lb-stage{
+    position:relative;
+    overflow:hidden;
+    touch-action:none;
+    display:grid;
+    place-items:center;
+  }
+  .lb-img{
+    max-width:100%;
+    max-height:100%;
+    display:block;
+    transform-origin:center center;
+    will-change:transform;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .lb-img.snap{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+
+  .lb-foot{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+  .lb-foot .step{
+    border-color:rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    color:#F2EDE6;
+  }
+  .lb-hint{
+    flex:1;
+    text-align:center;
+    font-size:11px;
+    letter-spacing:.05em;
+    color:rgba(242,237,230,.45);
+  }
+
+  /* ---------- first-run hint ---------- */
+  /* A full-width bar rather than a centered pill: the rise
+     animation ends on transform:none, which would undo any
+     translate used for centering. */
+  .coach{
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:calc(70px + env(safe-area-inset-bottom));
+    z-index:40;
+    padding:9px 16px;
+    border-radius:99px;
+    background:var(--card);
+    border:1px solid var(--line-2);
+    box-shadow:0 12px 30px -14px rgba(0,0,0,.8);
+    font-size:12.5px;
+    line-height:1.35;
+    text-align:center;
+    color:var(--muted);
+    text-wrap:balance;
+    animation:rise .5s .5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .coach[hidden]{display:none}
+  .coach b{color:var(--ink);font-weight:600}
+
+  /* ---------- motion ---------- */
+  .page.is-active .shot-num,
+  .page.is-active .chips{animation:rise .42s cubic-bezier(.2,.8,.2,1) both}
+  .page.is-active .chips{animation-delay:.05s}
+  @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    .holes{scroll-behavior:auto}
+  }
+
+  /* ---------- small screens ---------- */
+  @media (max-width:400px){
+    .wordmark .long{display:none}
+  }
+  @media (max-width:380px){
+    .sheet{padding:11px 11px 22px;gap:10px}
+    .shot-num{font-size:46px}
+    .shot-tag{bottom:calc(6px + 46px)}
+    .blk p{font-size:15.5px}
+    .slope-wrap,.slope{width:62px}
+    .slope{height:62px}
+  }
+
+  /* ---------- phone on its side: photo left, notes right ---------- */
+  @media (orientation:landscape) and (max-height:560px){
+    .sheet{
+      max-width:none;
+      display:grid;
+      grid-template-columns:minmax(0,42%) minmax(0,1fr);
+      align-items:start;
+      gap:12px;
+      padding:11px 13px 18px;
+    }
+    .shot{grid-row:span 5;max-height:none;position:sticky;top:0}
+    .coach{display:none}
+  }
+
+  @media (min-height:820px){
+    .sheet{gap:14px}
+    .shot{max-height:min(38vh,400px)}
+    .shot-num{font-size:62px}
+    .shot-tag{bottom:calc(6px + 62px)}
+  }
+</style>
+</head>
+<body>
+
+<div class="book">
+
+  <header class="bar">
+    <svg class="flag" viewBox="0 0 24 32" aria-hidden="true">
+      <path class="pole" d="M6 29 V4" />
+      <path class="cloth" d="M7.4 5 L21 9.4 L7.4 13.8 Z" />
+    </svg>
+    <div class="wordmark"><span class="long">Dismal River · </span><b>White<span class="long"> Course</span></b></div>
+    <div class="bar-actions">
+      <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch to daylight mode">☀</button>
+      <a class="icon-btn" id="home-link" href="index.html" aria-label="Back to the trip site" hidden>↩</a>
+    </div>
+  </header>
+
+  <div class="progress" aria-hidden="true"><i id="bar-fill"></i></div>
+
+  <div class="track" id="track" tabindex="0" aria-label="Hole by hole, swipe or use arrow keys"></div>
+
+  <nav class="rail" aria-label="Jump to hole">
+    <button class="step" id="prev" type="button" aria-label="Previous hole">‹</button>
+    <div class="holes" id="holes"></div>
+    <button class="step" id="next" type="button" aria-label="Next hole">›</button>
+  </nav>
+
+</div>
+
+<div class="coach" id="coach" hidden>
+  <span>Swipe for the next hole · <b>tap the photo to zoom</b></span>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Hole photo">
+  <div class="lb-bar">
+    <div class="lb-title" id="lb-title"></div>
+    <button class="icon-btn" id="lb-close" type="button" aria-label="Close photo">✕</button>
+  </div>
+  <div class="lb-stage" id="lb-stage">
+    <img class="lb-img" id="lb-img" alt="" />
+  </div>
+  <div class="lb-foot">
+    <button class="step" id="lb-prev" type="button" aria-label="Previous hole">‹</button>
+    <span class="lb-hint" id="lb-hint">Pinch or double-tap to zoom · swipe down to close</span>
+    <button class="step" id="lb-next" type="button" aria-label="Next hole">›</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     THE BOOK — notes transcribed from the White course summary.
+     slope.deg is the fall direction: 0 = left to right,
+     90 = away from you (front to back), 180 = right to left,
+     270 = toward you (back to front).
+     Photos live in PHOTOS at the bottom of this file, one
+     base64 JPEG per hole, so the whole thing works with no bars.
+     ============================================================ */
+  var HOLES = [
+    {
+      n: 1,
+      par: 4, hcp: 7,
+      y: { back: 433, mid: 412, fwd: 275 },
+      tee: "Aim right side of the bunkers on the left. Feeds into a natural bowl with a view of the green. {240}+ carry is fine. Shots right of center can feed into the native grass or the traps.",
+      app: "No room long or on either side.",
+      grn: "Punchbowl green, feeds left to right. Min carry is 15 yards short of center if going over the trap.",
+      keys: [
+        { v: "{240}+", l: "carry is fine" },
+        { v: "15 yds", l: "inside center — min carry over the trap" }
+      ],
+      tags: ["Punchbowl"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 2,
+      par: 4, hcp: 1,
+      y: { back: [510, 455], mid: 415, fwd: 343 },
+      tee: "Severe drop on the right side. Fairway is narrower and slopes left to right.",
+      app: "Left or short will funnel on to the green. Minimal room right or long.",
+      grn: "Punchbowl green, upper shelf on the left, then slopes left to right.",
+      keys: [],
+      tags: ["Punchbowl", "Upper shelf left"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 3,
+      par: 3, hcp: 17,
+      y: { back: 187, mid: 145, fwd: 88 },
+      tee: "Left or long are safer.",
+      app: "",
+      grn: "Humpback green with a shelf in the middle.",
+      keys: [],
+      tags: ["Humpback", "Center shelf"],
+      slope: null
+    },
+    {
+      n: 4,
+      par: 5, hcp: 9,
+      y: { back: 578, mid: 498, fwd: 416 },
+      tee: "Fairway gets skinny around {255} yards. Traps on the left are about {260} out.",
+      app: "Massive landing area right of the windmill. The windmill is in a small pond.",
+      grn: "Slopes back to front and left to right. Upper and lower shelves with a backstop.",
+      keys: [
+        { v: "{255}", l: "fairway narrows" },
+        { v: "{260}", l: "traps on the left" }
+      ],
+      tags: ["Two shelves", "Backstop"],
+      slope: { deg: 315, label: "Left to right" }
+    },
+    {
+      n: 5,
+      par: 3, hcp: 11,
+      y: { back: 187, mid: 155, fwd: 120 },
+      tee: "5–6 yards uphill. Room long, but it rolls off the back.",
+      app: "",
+      grn: "Punchbowl on the sides, but a false front, and balls in the back will roll off. Generally breaks right to left in the center.",
+      keys: [
+        { v: "5–6 yds", l: "plays uphill" }
+      ],
+      tags: ["Punchbowl sides", "False front"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 6,
+      par: 4, hcp: 13,
+      y: { back: 348, mid: 313, fwd: 263 },
+      tee: "Best shot is short right of the trap, ~{230} yards.",
+      app: "No room long or on either side. Trap long of the green.",
+      grn: "Steep bowl with a backstop.",
+      keys: [
+        { v: "~{230}", l: "short right of the trap" }
+      ],
+      tags: ["Steep bowl", "Backstop"],
+      slope: null
+    },
+    {
+      n: 7,
+      par: 4, hcp: 3,
+      y: { back: [475, 437], mid: 366, fwd: 308 },
+      tee: "{260}+ to clear the traps on the left. Fairway gets skinny between the traps at about {250}.",
+      app: "Room short, right or left only.",
+      grn: "Slopes back to front. False front.",
+      keys: [
+        { v: "{260}+", l: "clears the traps left" },
+        { v: "~{250}", l: "fairway narrows between traps" }
+      ],
+      tags: ["False front"],
+      slope: { deg: 270, label: "Back to front" }
+    },
+    {
+      n: 8,
+      par: 4, hcp: 15,
+      y: { back: 333, mid: 285, fwd: 218 },
+      tee: "{200} to clear with a straight shot, but anything left of center will funnel into the trap or the native. Plays 6 yards uphill if going for it, with a slight righthand punchbowl. Safe layup is {190}–{210} to the left.",
+      app: "If laying up, a backstop is present. Some room short (straight) or right (if laying up).",
+      grn: "Right to left slope if going for it, back to front if laying up.",
+      keys: [
+        { v: "{200}", l: "carry on the straight line" },
+        { v: "{190}–{210}", l: "safe layup, left" },
+        { v: "6 yds", l: "uphill if going for it" }
+      ],
+      tags: [],
+      slope: null
+    },
+    {
+      n: 9,
+      par: 5, hcp: 5,
+      y: { back: 618, mid: 593, fwd: 460 },
+      tee: "Massive ravine on the left ~{230} out. Widest fairway is a {250} carry.",
+      app: "Ravine left of the lefthand traps. Best layup is 110–120 yards from center.",
+      grn: "Large kidney bean with a small backstop and a left punchbowl.",
+      keys: [
+        { v: "~{230}", l: "ravine opens on the left" },
+        { v: "{250}", l: "widest fairway, carry" },
+        { v: "110–120 yds", l: "best layup, from center" }
+      ],
+      tags: ["Kidney", "Backstop", "Punchbowl left"],
+      slope: null
+    },
+    {
+      n: 10,
+      par: 3, hcp: 14,
+      y: { back: 190, mid: 167, fwd: 95 },
+      tee: "60 yard long donut green, with a trap in the center.",
+      app: "",
+      grn: "Lower half is severely left to right with multiple tiers. Upper half is also left to right, and a punchbowl. Trap long and left of center of the green.",
+      keys: [
+        { v: "60 yds", l: "green, front to back" }
+      ],
+      tags: ["Donut", "Trap in center", "Multiple tiers"],
+      slope: { deg: 0, label: "Left to right", strong: true }
+    },
+    {
+      n: 11,
+      par: 4, hcp: 8,
+      y: { back: 443, mid: 398, fwd: 318 },
+      tee: "Widest part of the fairway is over the left corner of the visible trap. {220}–{260} is safe. Beyond {275} funnels left below the traps or into the rough.",
+      app: "Room on the right.",
+      grn: "Lefthand punchbowl. Green slopes left to right and front to back.",
+      keys: [
+        { v: "{220}–{260}", l: "safe window" },
+        { v: "{275}+", l: "funnels left or into rough" }
+      ],
+      tags: ["Punchbowl left"],
+      slope: { deg: 45, label: "Left to right" }
+    },
+    {
+      n: 12,
+      par: 5, hcp: 4,
+      y: { back: 572, mid: 536, fwd: 428 },
+      tee: "Widest part of the fairway is {260}.",
+      app: "Massive 60 yard long trap on the right. Some safety left of the green.",
+      grn: "Green slopes left to right.",
+      keys: [
+        { v: "{260}", l: "widest fairway" }
+      ],
+      tags: [],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 13,
+      par: 4, hcp: 12,
+      y: { back: 433, mid: 397, fwd: 267 },
+      tee: "Right side of the trap offers the best approach. Safest aim is right of the trap, a {235} shot. A {280}+ drive could roll into the native.",
+      app: "Huge safety on the right, drop off on the left.",
+      grn: "Long but skinny. Relatively flat but slopes off on the left side.",
+      keys: [
+        { v: "{235}", l: "right of the trap" },
+        { v: "{280}+", l: "rolls into native" }
+      ],
+      tags: ["Long and skinny"],
+      slope: { deg: 180, label: "Falls off left" }
+    },
+    {
+      n: 14,
+      par: 4, hcp: 2,
+      y: { back: 515, mid: 441, fwd: 352 },
+      tee: "Punchbowl fairway — aim at the center of the green.",
+      app: "Room long and left of the green.",
+      grn: "Green slopes left to right and front to back. Flatter in the center.",
+      keys: [],
+      tags: ["Flat center"],
+      slope: { deg: 45, label: "Left to right" }
+    },
+    {
+      n: 15,
+      par: 3, hcp: 18,
+      y: { back: 186, mid: 171, fwd: 102 },
+      tee: "Tons of room left, but it slopes severely downhill. Some room right or short. The trap ends at the same distance as the center of the green.",
+      app: "",
+      grn: "Punchbowl. Slopes right to left.",
+      keys: [],
+      tags: ["Punchbowl"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 16,
+      par: 4, hcp: 16,
+      y: { back: [430, 400], mid: 382, fwd: 330 },
+      tee: "Massive punchbowl landing. Widest part of the fairway is {230}.",
+      app: "Plenty of room left and right. Punchbowl green.",
+      grn: "Front tier is higher than the back. Left to right. Slight backstop.",
+      keys: [
+        { v: "{230}", l: "widest fairway" }
+      ],
+      tags: ["Front tier higher", "Slight backstop"],
+      slope: { deg: 45, label: "Left to right" }
+    },
+    {
+      n: 17,
+      par: 4, hcp: 10,
+      y: { back: 460, mid: 428, fwd: 324 },
+      tee: "Fairly flat, drops downhill after {260}.",
+      app: "Room on the right.",
+      grn: "Large right to left slope.",
+      keys: [
+        { v: "{260}", l: "starts downhill" }
+      ],
+      tags: [],
+      slope: { deg: 180, label: "Right to left", strong: true }
+    },
+    {
+      n: 18,
+      par: 5, hcp: 6,
+      y: { back: 500, mid: 428, fwd: 351 },
+      tee: "Punchbowl on the right. The trap on the left runs the entire approach. Aim more right.",
+      app: "Room right, straight long, or very short.",
+      grn: "Green slopes back to front and right to left.",
+      keys: [],
+      tags: [],
+      slope: { deg: 225, label: "Right to left" }
+    }
+  ];
+
+  /* Pixel dimensions of each baked-in photo, written by the build
+     script. The back-nine renders are not all the same shape as the
+     front-nine ones, so each card takes its ratio from its own photo
+     rather than a single hardcoded one — otherwise a wide hole like 18
+     would get a third of it cropped away. */
+  /*__SIZES__*/
+
+  var track = document.getElementById("track");
+  var holesRail = document.getElementById("holes");
+  var barFill = document.getElementById("bar-fill");
+  var prevBtn = document.getElementById("prev");
+  var nextBtn = document.getElementById("next");
+  var themeBtn = document.getElementById("theme-btn");
+  var coach = document.getElementById("coach");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var BLOB = "M39 8 C55 8 70 20 70 38 C70 56 56 70 39 70 C22 70 8 57 8 39 C8 21 23 8 39 8 Z";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* A small plan view of the green: front edge nearest you at the
+     bottom, contour lines across the slope, arrow down the fall line. */
+  function slopeSVG(hole) {
+    var s = hole.slope;
+    if (!s) return "";
+    var rot = -s.deg;
+    var w = s.strong ? 3.6 : 2.5;
+    var id = "clip" + hole.n;
+    return '' +
+      '<div class="slope-wrap">' +
+        '<svg class="slope" viewBox="0 0 78 78" role="img" aria-label="Green falls ' + esc(s.label.toLowerCase()) + '">' +
+          '<defs><clipPath id="' + id + '"><path d="' + BLOB + '"/></clipPath></defs>' +
+          '<path class="blob" d="' + BLOB + '"/>' +
+          '<g class="cont" clip-path="url(#' + id + ')" transform="rotate(' + rot + ' 39 39)">' +
+            '<path d="M21 4 Q27 39 21 74"/>' +
+            '<path d="M35 2 Q41 39 35 76"/>' +
+            '<path d="M49 4 Q55 39 49 74"/>' +
+          '</g>' +
+          '<g class="arw" transform="rotate(' + rot + ' 39 39)" stroke-width="' + w + '">' +
+            '<path d="M21 39 H52"/>' +
+            '<path d="M44 31 L53 39 L44 47"/>' +
+          '</g>' +
+        '</svg>' +
+        '<div class="slope-cap">' + esc(s.label) + '</div>' +
+      '</div>';
+  }
+
+  function teecol(set, label, swatch) {
+    return '<button type="button" class="teecol" data-tee="' + set + '"' +
+           ' aria-pressed="false" aria-label="' + label + ' tees">' +
+           '<span class="dot" style="background:' + swatch + '"></span>' +
+           '<span class="tl">' + label + "</span>" +
+           '<span class="tv"></span></button>';
+  }
+
+  function block(cls, label, text, extra, emptyMsg) {
+    if (!text) {
+      return '<section class="blk ' + cls + ' empty"><h2>' + label + '</h2>' +
+             "<p>" + (emptyMsg || "Nothing noted here.") + "</p></section>";
+    }
+    return '<section class="blk ' + cls + '"><h2>' + label + '</h2>' +
+           (extra || "<p>" + esc(text) + "</p>") + "</section>";
+  }
+
+  function pageHTML(hole) {
+    var keys = hole.keys.map(function (k) {
+      return '<div class="chip"><span class="v">' + renderNums(k.v, 0) + "</span>" +
+             '<span class="l">' + esc(k.l) + "</span></div>";
+    }).join("");
+
+    var tags = hole.tags.map(function (t) {
+      return '<span class="tag">' + esc(t) + "</span>";
+    }).join("");
+
+    var greenInner = '<div class="green-row">' + slopeSVG(hole) +
+      '<div class="green-text"><p>' + esc(hole.grn) + "</p>" +
+      (tags ? '<div class="tags">' + tags + "</div>" : "") +
+      "</div></div>";
+
+    return '' +
+      '<article class="page" id="h' + hole.n + '" aria-label="Hole ' + hole.n + '">' +
+        '<div class="sheet">' +
+          '<button type="button" class="shot" data-hole="' + hole.n + '"' +
+                 ' style="aspect-ratio:' + SIZES[hole.n][0] + "/" + SIZES[hole.n][1] + '"' +
+                 ' aria-label="Hole ' + hole.n + ' from the tee — tap to zoom">' +
+            '<img class="shot-img" alt="" />' +
+            '<span class="shot-scrim"></span>' +
+            '<span class="shot-tag">Par ' + hole.par + " · Hcp " + hole.hcp + "</span>" +
+            '<span class="shot-num">' + hole.n + "</span>" +
+            '<span class="shot-zoom" aria-hidden="true">⤢</span>' +
+          "</button>" +
+          '<div class="tees">' +
+            teecol("back", "Back", "#3A4E45") +
+            teecol("mid", "Middle", "#EFEBE0") +
+            teecol("fwd", "Forward", "#C8635C") +
+          "</div>" +
+          (keys ? '<div class="chips">' + keys + "</div>" : "") +
+          block("tee", 'Off the tee<span class="from" hidden></span>', hole.tee,
+                "<p>" + renderNums(hole.tee, 0) + "</p>" +
+                (hole.caveat ? '<p class="caveat">' + esc(hole.caveat) + "</p>" : "")) +
+          block("app", "Approach", hole.app, null,
+                hole.par === 3 ? "Par 3 — the tee shot is the approach."
+                               : "No separate approach note — the tee line covers it.") +
+          block("grn", "The green", hole.grn, greenInner, "No green notes for this one.") +
+        "</div>" +
+      "</article>";
+  }
+
+  track.innerHTML = HOLES.map(pageHTML).join("");
+
+  var pages = Array.prototype.slice.call(track.querySelectorAll(".page"));
+  var shots = pages.map(function (p) { return p.querySelector(".shot-img"); });
+
+  /* ---------- bottom rail ---------- */
+  HOLES.forEach(function (hole, i) {
+    if (i === 9) {
+      var turn = document.createElement("span");
+      turn.className = "turn";
+      turn.setAttribute("aria-hidden", "true");
+      holesRail.appendChild(turn);
+    }
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "pip";
+    b.textContent = hole.n;
+    b.setAttribute("aria-label", "Hole " + hole.n);
+    b.addEventListener("click", function () { goTo(i, true); });
+    holesRail.appendChild(b);
+  });
+  var pips = Array.prototype.slice.call(holesRail.querySelectorAll(".pip"));
+
+  /* ---------- tee set ----------
+     Yardages, par and stroke index come from the club's White
+     scorecard, which names its tees Back / Middle / Forward rather
+     than by colour. */
+  var TEE_NAMES = { back: "Back", mid: "Middle", fwd: "Forward" };
+
+  // Every distance in the notes was paced from the Middle tee, so
+  // that's the set the numbers are written against. Pick another tee
+  // and the tee-shot carries shift by the difference in hole length.
+  var BASE_TEE = "mid";
+  var tee = BASE_TEE;
+  try {
+    var savedTee = localStorage.getItem("dr-white-tee");
+    if (TEE_NAMES[savedTee]) tee = savedTee;
+  } catch (e) {}
+
+  /* Shift every {N} in the tee notes by the difference between the
+     chosen tee and the White tee the notes were written from. This
+     assumes the tee boxes sit back along the same line, which is the
+     usual case but not a survey — hence the marked-up numbers and the
+     badge on the block, so nobody mistakes a derived carry for a
+     measured one. Numbers anchored to the green, to another feature,
+     or to elevation are left bare in the source and never move. */
+  function renderNums(text, delta) {
+    return esc(text).replace(/\{(\d+)\}/g, function (_, n) {
+      var v = parseInt(n, 10) + delta;
+      return delta ? '<b class="adj">' + v + "</b>" : String(v);
+    });
+  }
+
+  // Holes 2, 7 and 16 list two Back tee boxes. The longer one is the
+  // rated set, so it's the one the carry maths works from.
+  function yOf(hole, set) {
+    var y = hole.y[set];
+    return Array.isArray(y) ? y[0] : y;
+  }
+
+  // Normally the notes were paced from the White tee, so White is what
+  // the carries shift from. A hole can override that with noteFrom when
+  // the yardage they were actually paced against isn't on the card —
+  // no White hole has needed it so far.
+  function noteBase(hole) {
+    return hole.noteFrom || yOf(hole, BASE_TEE);
+  }
+
+  function baseLabel(hole) {
+    return hole.noteFrom ? String(hole.noteFrom) : TEE_NAMES[BASE_TEE];
+  }
+
+  function paintYardages() {
+    pages.forEach(function (page, i) {
+      var hole = HOLES[i];
+      var delta = yOf(hole, tee) - noteBase(hole);
+
+      Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
+        var set = col.getAttribute("data-tee");
+        var y = hole.y[set];
+        col.querySelector(".tv").innerHTML = Array.isArray(y)
+          ? y[0] + '<span class="alt">' + y[1] + "</span>"
+          : String(y);
+        col.setAttribute("aria-pressed", String(set === tee));
+      });
+
+      var p = page.querySelector(".blk.tee p");
+      if (p && hole.tee) p.innerHTML = renderNums(hole.tee, delta);
+
+      var badge = page.querySelector(".blk.tee .from");
+      if (badge) {
+        badge.textContent = (delta > 0 ? "+" : "−") + Math.abs(delta) +
+                            " yds from " + baseLabel(hole);
+        badge.hidden = !delta;
+      }
+
+      var chips = page.querySelectorAll(".chip .v");
+      Array.prototype.forEach.call(chips, function (el, k) {
+        el.innerHTML = renderNums(hole.keys[k].v, delta);
+      });
+    });
+  }
+
+  // Delegated: there are 27 of these, three on every hole card.
+  track.addEventListener("click", function (e) {
+    var col = e.target.closest && e.target.closest(".teecol");
+    if (!col) return;
+    tee = col.getAttribute("data-tee");
+    paintYardages();
+    try { localStorage.setItem("dr-white-tee", tee); } catch (err) {}
+  });
+
+  paintYardages();
+
+  /* ---------- photos ----------
+     Every JPEG is already in the file, but these are 2674x1654 —
+     about 18 MB each once decoded — so nine at a time would be a lot
+     to ask of a phone. Only the current hole and the one either side
+     of it get a src; the rest are dropped again. The lightbox reuses
+     whatever the current card already decoded. */
+  function hydrate(i) {
+    shots.forEach(function (img, n) {
+      var near = Math.abs(n - i) <= 1;
+      if (near && !img.src) {
+        img.addEventListener("load", function () { img.classList.add("ready"); }, { once: true });
+        img.src = PHOTOS[HOLES[n].n];
+        img.alt = "Hole " + HOLES[n].n + " from the tee";
+      } else if (!near && img.src) {
+        img.removeAttribute("src");
+        img.classList.remove("ready");
+      }
+    });
+  }
+
+  /* ---------- navigation ---------- */
+  var current = -1;
+  var settling = null;      // hole we're animating toward, if any
+  var settleTimer;
+
+  function goTo(i, smooth) {
+    i = Math.max(0, Math.min(HOLES.length - 1, i));
+    var animate = smooth && !reduced && Math.abs(i - current) > 0;
+    if (animate) {
+      // Ignore the holes we sail past on the way, so only the
+      // destination plays its entrance.
+      settling = i;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { settling = null; }, 700);
+    }
+    track.scrollTo({
+      left: i * track.clientWidth,
+      behavior: animate ? "smooth" : "auto"
+    });
+    setCurrent(i);
+  }
+
+  function setCurrent(i) {
+    if (i === current) return;
+    current = i;
+
+    hydrate(i);
+
+    pips.forEach(function (p, n) {
+      if (n === i) { p.setAttribute("aria-current", "true"); }
+      else { p.removeAttribute("aria-current"); }
+    });
+    pages.forEach(function (p, n) { p.classList.toggle("is-active", n === i); });
+
+    barFill.style.width = ((i + 1) / HOLES.length) * 100 + "%";
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === HOLES.length - 1;
+
+    pips[i].scrollIntoView({ inline: "center", block: "nearest" });
+    if (!lb.hidden) paintLightbox();
+
+    try {
+      localStorage.setItem("dr-white-hole", String(HOLES[i].n));
+      history.replaceState(null, "", "#h" + HOLES[i].n);
+    } catch (e) { /* private mode — nav still works */ }
+  }
+
+  var ticking = false;
+  track.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var w = track.clientWidth;
+      if (w > 0) {
+        var i = Math.round(track.scrollLeft / w);
+        if (settling === null) {
+          setCurrent(i);
+        } else if (i === settling) {
+          settling = null;
+          clearTimeout(settleTimer);
+        }
+      }
+      ticking = false;
+    });
+  }, { passive: true });
+
+  prevBtn.addEventListener("click", function () { goTo(current - 1, true); });
+  nextBtn.addEventListener("click", function () { goTo(current + 1, true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Escape" && !lb.hidden) { closeLightbox(); e.preventDefault(); return; }
+    if (e.key === "ArrowRight") { goTo(current + 1, true); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { goTo(current - 1, true); e.preventDefault(); }
+    else if (e.key === "Home") { goTo(0, true); e.preventDefault(); }
+    else if (e.key === "End") { goTo(HOLES.length - 1, true); e.preventDefault(); }
+  });
+
+  // Keep the current hole centered if the phone rotates.
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    var keep = current;
+    resizeTimer = setTimeout(function () {
+      track.scrollTo({ left: keep * track.clientWidth, behavior: "auto" });
+      if (!lb.hidden) resetZoom(false);
+    }, 120);
+  });
+
+  /* ============================================================
+     LIGHTBOX
+     ============================================================ */
+  var lb = document.getElementById("lb");
+  var lbImg = document.getElementById("lb-img");
+  var lbTitle = document.getElementById("lb-title");
+  var lbStage = document.getElementById("lb-stage");
+
+  var scale = 1, tx = 0, ty = 0;
+  var pointers = new Map();
+  var pinchDist = 0, pinchMid = null;
+  var dragged = false, startX = 0, startY = 0, startTx = 0, startTy = 0;
+  var lastTap = 0, lastTapX = 0, lastTapY = 0;
+
+  function paint(snap) {
+    lbImg.classList.toggle("snap", !!snap && !reduced);
+    lbImg.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
+    if (snap) {
+      setTimeout(function () { lbImg.classList.remove("snap"); }, 240);
+    }
+  }
+
+  function clamp() {
+    var maxX = Math.max(0, (lbImg.clientWidth * scale - lbStage.clientWidth) / 2);
+    var maxY = Math.max(0, (lbImg.clientHeight * scale - lbStage.clientHeight) / 2);
+    tx = Math.max(-maxX, Math.min(maxX, tx));
+    ty = Math.max(-maxY, Math.min(maxY, ty));
+  }
+
+  function resetZoom(snap) {
+    scale = 1; tx = 0; ty = 0;
+    paint(snap);
+  }
+
+  // Zoom about a point in viewport coordinates, keeping whatever
+  // is under the finger under the finger.
+  function zoomAbout(next, px, py, snap) {
+    next = Math.max(1, Math.min(6, next));
+    var r = lbStage.getBoundingClientRect();
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height / 2;
+    tx += (px - cx - tx) * (1 - next / scale);
+    ty += (py - cy - ty) * (1 - next / scale);
+    scale = next;
+    clamp();
+    paint(snap);
+  }
+
+  function paintLightbox() {
+    var hole = HOLES[current];
+    lbImg.src = PHOTOS[hole.n];
+    lbImg.alt = "Hole " + hole.n + " from the tee";
+    lbTitle.innerHTML = "<b>Hole " + hole.n + "</b> · tee view";
+    resetZoom(false);
+  }
+
+  function openLightbox() {
+    lb.hidden = false;
+    paintLightbox();
+    document.getElementById("lb-close").focus();
+  }
+
+  function closeLightbox() {
+    lb.hidden = true;
+    lbImg.removeAttribute("src");
+    pointers.clear();
+  }
+
+  track.addEventListener("click", function (e) {
+    var shot = e.target.closest && e.target.closest(".shot");
+    if (!shot) return;
+    dismissCoach();
+    var i = HOLES.findIndex(function (h) {
+      return String(h.n) === shot.getAttribute("data-hole");
+    });
+    if (i >= 0 && i !== current) goTo(i, false);
+    openLightbox();
+  });
+
+  document.getElementById("lb-close").addEventListener("click", closeLightbox);
+  document.getElementById("lb-prev").addEventListener("click", function () { goTo(current - 1, false); });
+  document.getElementById("lb-next").addEventListener("click", function () { goTo(current + 1, false); });
+
+  lbStage.addEventListener("pointerdown", function (e) {
+    lbStage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      var p = Array.from(pointers.values());
+      pinchDist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      pinchMid = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+    } else if (pointers.size === 1) {
+      dragged = false;
+      startX = e.clientX; startY = e.clientY;
+      startTx = tx; startTy = ty;
+    }
+  });
+
+  lbStage.addEventListener("pointermove", function (e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      var p = Array.from(pointers.values());
+      var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      var mid = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+      if (pinchDist > 0) {
+        // Pan with the midpoint as well as scale about it.
+        tx += mid.x - pinchMid.x;
+        ty += mid.y - pinchMid.y;
+        zoomAbout(scale * (d / pinchDist), mid.x, mid.y, false);
+      }
+      pinchDist = d;
+      pinchMid = mid;
+      dragged = true;
+      return;
+    }
+
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragged = true;
+
+    if (scale > 1) {
+      tx = startTx + dx;
+      ty = startTy + dy;
+      clamp();
+      paint(false);
+    } else {
+      // Zoomed out: the drag is a gesture, so let the photo follow
+      // the finger a little to show it landed.
+      lbImg.style.transform = "translate(" + dx * 0.4 + "px," + dy * 0.4 + "px) scale(1)";
+    }
+  });
+
+  function endPointer(e) {
+    if (!pointers.has(e.pointerId)) return;
+    var wasPinch = pointers.size === 2;
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchDist = 0;
+
+    if (wasPinch) {
+      if (scale <= 1.02) resetZoom(true);
+      // Re-anchor the surviving finger so panning doesn't jump.
+      var left = Array.from(pointers.values())[0];
+      if (left) { startX = left.x; startY = left.y; startTx = tx; startTy = ty; }
+      return;
+    }
+    if (pointers.size > 0) return;
+
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+
+    if (scale === 1 && dragged) {
+      // A flick at rest: sideways changes hole, down dismisses.
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
+        goTo(current + (dx < 0 ? 1 : -1), false);
+      } else if (dy > 75) {
+        closeLightbox();
+        return;
+      }
+      paint(true);
+      return;
+    }
+
+    if (dragged) return;
+
+    // A clean tap — double it to zoom.
+    var now = Date.now();
+    var quick = now - lastTap < 300 &&
+                Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 32;
+    lastTap = now; lastTapX = e.clientX; lastTapY = e.clientY;
+    if (quick) {
+      lastTap = 0;
+      if (scale > 1.02) resetZoom(true);
+      else zoomAbout(2.6, e.clientX, e.clientY, true);
+    }
+  }
+
+  lbStage.addEventListener("pointerup", endPointer);
+  lbStage.addEventListener("pointercancel", endPointer);
+
+  lbStage.addEventListener("dblclick", function (e) { e.preventDefault(); });
+
+  lbStage.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    zoomAbout(scale * (e.deltaY < 0 ? 1.14 : 1 / 1.14), e.clientX, e.clientY, false);
+  }, { passive: false });
+
+  /* ---------- daylight mode ---------- */
+  function applyTheme(mode) {
+    if (mode) { document.documentElement.setAttribute("data-theme", mode); }
+    else { document.documentElement.removeAttribute("data-theme"); }
+
+    var dark = mode
+      ? mode === "dark"
+      : !window.matchMedia("(prefers-color-scheme: light)").matches;
+
+    themeBtn.textContent = dark ? "☀" : "☾";
+    themeBtn.setAttribute("aria-label", dark ? "Switch to daylight mode" : "Switch to night mode");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#070E0B" : "#E7E4D8");
+  }
+
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("dr-white-theme"); } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeBtn.addEventListener("click", function () {
+    var isDark = themeBtn.textContent === "☀";
+    var next = isDark ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("dr-white-theme", next); } catch (e) {}
+  });
+
+  /* ---------- first-run hint ---------- */
+  var seen = false;
+  try { seen = localStorage.getItem("dr-white-seen") === "1"; } catch (e) {}
+  if (!seen) coach.hidden = false;
+
+  function dismissCoach() {
+    if (coach.hidden) return;
+    coach.hidden = true;
+    try { localStorage.setItem("dr-white-seen", "1"); } catch (e) {}
+  }
+  // Armed late so the opening scroll to the saved hole doesn't count.
+  setTimeout(function () {
+    track.addEventListener("scroll", dismissCoach, { once: true, passive: true });
+  }, 500);
+  setTimeout(dismissCoach, 9000);
+
+  /* ---------- opening hole ---------- */
+  var start = 0;
+  var fromHash = /^#h(\d{1,2})$/.exec(location.hash);
+  if (fromHash) {
+    start = Math.max(0, Math.min(HOLES.length - 1, parseInt(fromHash[1], 10) - 1));
+  } else {
+    try {
+      var last = parseInt(localStorage.getItem("dr-white-hole"), 10);
+      if (last >= 1 && last <= HOLES.length) start = last - 1;
+    } catch (e) {}
+  }
+
+  // The track has no width until layout settles on some mobile browsers.
+  requestAnimationFrame(function () {
+    track.scrollTo({ left: start * track.clientWidth, behavior: "auto" });
+    current = -1;
+    setCurrent(start);
+  });
+
+  // The back link only makes sense next to the trip site's index.html.
+  if (/white-course\.html$/i.test(location.pathname)) {
+    document.getElementById("home-link").hidden = false;
+  }
+
+  /* ============================================================
+     PHOTOS — nine tee views, base64 JPEG, generated by
+     build-caddies.py from Course Images/White/. Nothing below
+     this line is meant to be edited by hand.
+     ============================================================ */
+  /*__PHOTOS__*/
+})();
+</script>
+</body>
+</html>
