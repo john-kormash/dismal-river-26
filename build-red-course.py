@@ -15,7 +15,7 @@ import io
 import sys
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parent
 IMAGES = ROOT / "Course Images" / "Red"
@@ -24,7 +24,16 @@ OUTPUT = ROOT / "red-course.html"
 
 HOLES = range(1, 10)
 MAX_WIDTH = 1400   # the source renders are ~1337 wide; leave them alone
-QUALITY = 86       # high enough to hold up when you pinch into a bunker
+QUALITY = 86       # measured at 39 dB PSNR — the encode is not the weak link
+
+# The renders are only 1.1 MP and soft to begin with, so double-tapping
+# to 2.6x on a 3x phone upscales well past native and turns to mush.
+# An unsharp mask before encoding puts the bunker edges and fence lines
+# back. Drop PERCENT toward 0 if you ever re-export the source larger —
+# sharp input does not want this.
+SHARPEN_RADIUS = 1.6
+SHARPEN_PERCENT = 95
+SHARPEN_THRESHOLD = 2
 
 
 def encode(path: Path) -> str:
@@ -34,6 +43,12 @@ def encode(path: Path) -> str:
             (MAX_WIDTH, round(img.height * MAX_WIDTH / img.width)),
             Image.LANCZOS,
         )
+    if SHARPEN_PERCENT:
+        img = img.filter(ImageFilter.UnsharpMask(
+            radius=SHARPEN_RADIUS,
+            percent=SHARPEN_PERCENT,
+            threshold=SHARPEN_THRESHOLD,
+        ))
     buf = io.BytesIO()
     img.save(buf, "JPEG", quality=QUALITY, optimize=True, progressive=True)
     return base64.b64encode(buf.getvalue()).decode("ascii")
