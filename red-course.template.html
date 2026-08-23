@@ -173,7 +173,7 @@
   .progress i{
     display:block;
     height:100%;
-    width:11%;
+    width:5.5%;
     background:linear-gradient(90deg,var(--clay),var(--gold));
     transition:width .32s cubic-bezier(.2,.8,.2,1);
   }
@@ -222,7 +222,7 @@
     border-radius:15px;
     overflow:hidden;
     background:linear-gradient(160deg,#2A211C,#141010);
-    aspect-ratio:1337/827;
+    aspect-ratio:1337/827;   /* overridden per hole from SIZES */
     max-height:min(42vh,340px);
     cursor:zoom-in;
     box-shadow:var(--shadow);
@@ -330,6 +330,8 @@
     color:var(--muted);
     font-variant-numeric:tabular-nums;
   }
+  /* Holes 13, 17 and 18 have two Blue tee boxes. Both stay on screen. */
+  .teecol .tv .alt{display:block;font-size:11px;font-weight:600;opacity:.7}
   .teecol:hover{background:var(--surface-2)}
   .teecol[aria-pressed="true"]{border-color:var(--clay-line);background:var(--clay-soft)}
   .teecol[aria-pressed="true"] .tl{color:var(--clay)}
@@ -479,7 +481,9 @@
     display:flex;
     gap:4px;
     align-items:center;
-    justify-content:center;
+    /* flex-start, not center: centred flex content that overflows
+       makes the first pip unreachable in a scroll container. */
+    justify-content:flex-start;
     overflow-x:auto;
     scrollbar-width:none;
     scroll-behavior:smooth;
@@ -487,10 +491,8 @@
   }
   .holes::-webkit-scrollbar{display:none}
   .pip{
-    /* Nine of them, and they all fit — they shrink before they scroll. */
-    flex:1 1 0;
-    min-width:0;
-    max-width:38px;
+    flex:none;
+    width:32px;
     height:32px;
     border-radius:9px;
     border:1px solid var(--line);
@@ -502,6 +504,13 @@
     cursor:pointer;
     padding:0;
     transition:background .16s,color .16s,border-color .16s;
+  }
+  .turn{
+    flex:none;
+    width:1px;
+    height:20px;
+    background:var(--line-2);
+    margin:0 4px;
   }
   .pip:hover{color:var(--ink);border-color:var(--line-2)}
   .pip[aria-current="true"]{
@@ -667,7 +676,7 @@
       <path class="pole" d="M6 29 V4" />
       <path class="cloth" d="M7.4 5 L21 9.4 L7.4 13.8 Z" />
     </svg>
-    <div class="wordmark"><span class="long">Dismal River · </span><b>Red<span class="long"> Course</span></b> · front 9</div>
+    <div class="wordmark"><span class="long">Dismal River · </span><b>Red<span class="long"> Course</span></b></div>
     <div class="bar-actions">
       <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch to daylight mode">☀</button>
       <a class="icon-btn" id="home-link" href="index.html" aria-label="Back to the trip site" hidden>↩</a>
@@ -841,8 +850,136 @@
       keys: [],
       tags: ["Long and skinny", "Minimal break"],
       slope: null
+    },
+    {
+      n: 10,
+      par: 5, hcp: 9,
+      y: { blue: 546, white: 537, red: 407 },
+      tee: "Aim left of the trap — plenty of room so long as you fly {245}+ over the native. Trap starts around {290}.",
+      app: "Plenty of room right of the trap on the left in the distance. Short of the trap is also safe. Tons of room right. Some room left and deep.",
+      grn: "Long kidney bean. Mostly funnels into the center. Back portion is lower than the front.",
+      keys: [
+        { v: "{245}+", l: "carry over the native" },
+        { v: "~{290}", l: "the trap starts" }
+      ],
+      tags: ["Kidney", "Funnels to center"],
+      slope: { deg: 90, label: "Front to back" }
+    },
+    {
+      n: 11,
+      par: 3, hcp: 11,
+      y: { blue: 174, white: 149, red: 109 },
+      tee: "Plenty of room short left or long right. Hole plays 6 yards uphill.",
+      app: "",
+      grn: "Left side is flatter, right side is lower and bowled. Balls hit dead center will funnel down right. Back tier is a bit higher.",
+      keys: [
+        { v: "6 yds", l: "plays uphill" }
+      ],
+      tags: ["Right side bowled", "Back tier higher"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 12,
+      par: 4, hcp: 13,
+      y: { blue: 430, white: 355, red: 267 },
+      tee: "Safest and widest shot is a {200}–{230} carry, but the hole plays 6 yards downhill. Trouble on the left at {250}–{280}.",
+      app: "Room short or right. Hidden traps on the left of the green, and long right.",
+      grn: "Kidney bean with a right to left break.",
+      keys: [
+        { v: "{200}–{230}", l: "safest, widest carry" },
+        { v: "{250}–{280}", l: "trouble left" },
+        { v: "6 yds", l: "plays downhill" }
+      ],
+      tags: ["Kidney"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 13,
+      par: 4, hcp: 1,
+      y: { blue: [496, 480], white: 446, red: 311 },
+      tee: "Massive dogleg right. Aim just left of the trap you can see. Balls hit to center at {260}+ will catch a funnel.",
+      app: "Room short right or left. 30 yards between the sets of traps on the right. Minimal room long, and none right or left of the green.",
+      grn: "Predominant right to left and back to front breaks, otherwise fairly flat.",
+      keys: [
+        { v: "{260}+", l: "center — catches the funnel" }
+      ],
+      tags: ["Fairly flat"],
+      slope: { deg: 225, label: "Right to left", strong: true }
+    },
+    {
+      n: 14,
+      par: 4, hcp: 7,
+      y: { blue: 419, white: 355, red: 318 },
+      tee: "Room over the traps on the right, otherwise {250} to clear the native on the left.",
+      app: "Room right or long on any side. Shots right of the green may catch the hill and funnel on.",
+      grn: "Punchbowl on the right. High point is in the center, otherwise back to front break.",
+      keys: [
+        { v: "{250}", l: "clears the native, left" }
+      ],
+      tags: ["Punchbowl right", "High in the center"],
+      slope: { deg: 270, label: "Back to front" }
+    },
+    {
+      n: 15,
+      par: 4, hcp: 17,
+      y: { blue: 315, white: 271, red: 220 },
+      tee: "Aim right of the green, {230}–{250}. Traps and funnels start around {260}.",
+      app: "Don't be left. Some room on the right.",
+      grn: "Mostly right to left. Big green with a lot of movement on the front half.",
+      keys: [
+        { v: "{230}–{250}", l: "right of the green" },
+        { v: "~{260}", l: "traps and funnels start" }
+      ],
+      tags: ["Big green", "Movement front half"],
+      slope: { deg: 180, label: "Right to left" }
+    },
+    {
+      n: 16,
+      par: 3, hcp: 15,
+      y: { blue: 166, white: 131, red: 114 },
+      tee: "Room on the left. Some room long on the right half. Green is shaped like a wishbone facing right.",
+      app: "",
+      grn: "Lower right is the lowest point.",
+      keys: [],
+      tags: ["Wishbone", "Low point lower right"],
+      slope: null
+    },
+    {
+      n: 17,
+      par: 4, hcp: 5,
+      y: { blue: [454, 410], white: 390, red: 318 },
+      tee: "Good luck. Ideal shot is left of the clubhouse, on top of the visible hill. Anything right will funnel way down, and too far left is in the native. Upper fairway plays 14 yards uphill.",
+      app: "Room short of the green, or the left front half only. Do not be right or long. Hole plays 8 yards downhill from the upper fairway, or flat from the lower.",
+      grn: "Wavy, mostly left to right break.",
+      keys: [
+        { v: "14 yds", l: "upper fairway plays uphill" },
+        { v: "8 yds", l: "downhill to the green, from up top" }
+      ],
+      tags: ["Wavy"],
+      slope: { deg: 0, label: "Left to right" }
+    },
+    {
+      n: 18,
+      par: 4, hcp: 3,
+      y: { blue: [447, 410], white: 354, red: 271 },
+      tee: "Bombs away. Patches of native to about {260}–{270}, but left off the tee is safer. Very wavy fairway that slopes back to front ~20 feet.",
+      app: "Room left only. The native and hidden trap on the lefthand side are 50 yards long. Cannot be long or right.",
+      grn: "An oblong angled 20 degrees left. Breaks back to front and left to right.",
+      keys: [
+        { v: "{260}–{270}", l: "patches of native" },
+        { v: "~20 ft", l: "fairway falls back to front" }
+      ],
+      tags: ["Oblong", "Angled 20° left"],
+      slope: { deg: 315, label: "Left to right" }
     }
   ];
+
+  /* Pixel dimensions of each baked-in photo, written by the build
+     script. The back-nine renders are not all the same shape as the
+     front-nine ones, so each card takes its ratio from its own photo
+     rather than a single hardcoded one — otherwise a wide hole like 18
+     would get a third of it cropped away. */
+  /*__SIZES__*/
 
   var track = document.getElementById("track");
   var holesRail = document.getElementById("holes");
@@ -922,6 +1059,7 @@
       '<article class="page" id="h' + hole.n + '" aria-label="Hole ' + hole.n + '">' +
         '<div class="sheet">' +
           '<button type="button" class="shot" data-hole="' + hole.n + '"' +
+                 ' style="aspect-ratio:' + SIZES[hole.n][0] + "/" + SIZES[hole.n][1] + '"' +
                  ' aria-label="Hole ' + hole.n + ' from the tee — tap to zoom">' +
             '<img class="shot-img" alt="" />' +
             '<span class="shot-scrim"></span>' +
@@ -952,6 +1090,12 @@
 
   /* ---------- bottom rail ---------- */
   HOLES.forEach(function (hole, i) {
+    if (i === 9) {
+      var turn = document.createElement("span");
+      turn.className = "turn";
+      turn.setAttribute("aria-hidden", "true");
+      holesRail.appendChild(turn);
+    }
     var b = document.createElement("button");
     b.type = "button";
     b.className = "pip";
@@ -992,14 +1136,24 @@
     });
   }
 
+  // Holes 13, 17 and 18 list two Blue tee boxes. The longer one is the
+  // rated set, so it's the one the carry maths works from.
+  function yOf(hole, set) {
+    var y = hole.y[set];
+    return Array.isArray(y) ? y[0] : y;
+  }
+
   function paintYardages() {
     pages.forEach(function (page, i) {
       var hole = HOLES[i];
-      var delta = hole.y[tee] - hole.y[BASE_TEE];
+      var delta = yOf(hole, tee) - yOf(hole, BASE_TEE);
 
       Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
         var set = col.getAttribute("data-tee");
-        col.querySelector(".tv").textContent = String(hole.y[set]);
+        var y = hole.y[set];
+        col.querySelector(".tv").innerHTML = Array.isArray(y)
+          ? y[0] + '<span class="alt">' + y[1] + "</span>"
+          : String(y);
         col.setAttribute("aria-pressed", String(set === tee));
       });
 
@@ -1372,9 +1526,9 @@
 
   /* ---------- opening hole ---------- */
   var start = 0;
-  var fromHash = /^#h([1-9])$/.exec(location.hash);
+  var fromHash = /^#h(\d{1,2})$/.exec(location.hash);
   if (fromHash) {
-    start = parseInt(fromHash[1], 10) - 1;
+    start = Math.max(0, Math.min(HOLES.length - 1, parseInt(fromHash[1], 10) - 1));
   } else {
     try {
       var last = parseInt(localStorage.getItem("dr-red-hole"), 10);

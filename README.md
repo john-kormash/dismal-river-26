@@ -8,9 +8,9 @@ A single-page site for the August 27–30, 2026 golf trip: Denver → Ogallala �
 - `white-course.html` — the on-course yardage book for the White Course. One hole
   per screen, swipe or arrow-key to flip. **Fully self-contained** — no fonts, scripts
   or tiles from any CDN, so it still works once you're north of Ogallala with no bars.
-- `red-course.html` — the virtual caddy for the Red Course, front nine. Same idea, plus
+- `red-course.html` — the virtual caddy for the Red Course, all eighteen. Same idea, plus
   the tee view for every hole: tap the photo for full screen, pinch or double-tap to zoom
-  in on a bunker. The nine JPEGs are baked into the file as base64, so it is one 5.7 MB
+  in on a bunker. The eighteen JPEGs are baked into the file as base64, so it is one 10.7 MB
   file with **zero** network requests. Generated — see below.
 
 ## Run it locally
@@ -60,15 +60,29 @@ pip install pillow
 python build-red-course.py
 ```
 
-The script encodes `Course Images/Red/DismalRed_1..9.png` as base64 JPEGs and drops them
-into the template's `/*__PHOTOS__*/` marker. It **upscales them 2x with Lanczos and applies
-an unsharp mask first** — see `UPSCALE` / `SHARPEN_*` in the script. The originals are only
-1337x827 and soft, so at native size a phone renders them at roughly 1:1 and every soft pixel
-shows, while a desktop downsamples 2x and hides it. That's why they looked fine on one and
-muddy on the other. Upscaling here rather than letting the browser's bilinear filter do it
-when you pinch is a visible improvement, and it costs only file size (~640 KB per hole at
-quality 78, ~5.7 MB for the page). If you ever get higher-resolution renders, set `UPSCALE = 1`
-and drop `SHARPEN_PERCENT` toward 0 — sharp input doesn't want any of this.
+The script encodes `Course Images/Red/DismalRed_1..18.png` as base64 JPEGs and drops them
+into the template's `/*__PHOTOS__*/` marker, with their pixel dimensions going separately into
+`/*__SIZES__*/` near the top of the script. It **upscales with Lanczos and applies an unsharp
+mask first** — see `TARGET_WIDTH` / `MAX_UPSCALE` / `SHARPEN_*`. The originals are small and
+soft (861 to 1337 px wide), so at native size a phone renders them at roughly 1:1 and every
+soft pixel shows, while a desktop downsamples 2x and hides it. That's why they looked fine on
+one and muddy on the other. Upscaling here rather than letting the browser's bilinear filter
+do it when you pinch is a visible improvement, and it costs only file size (~600 KB per hole
+at quality 78, ~10.7 MB for the page).
+
+Sources are normalised to `TARGET_WIDTH` rather than multiplied by a fixed factor, because the
+back-nine renders are smaller than the front-nine ones and a flat multiplier would leave those
+holes visibly softer. `MAX_UPSCALE` caps it at 2.5x, past which Lanczos has nothing left to
+work with and the extra pixels are pure weight. The sharpening radius scales with the factor
+for the same reason — and because hole 14 carries a hand-drawn red aiming arrow that rings
+badly if you over-sharpen it.
+
+The renders are not all the same shape (hole 18 is 2.47:1, hole 13 is 1.49:1), so each card
+takes its aspect ratio from its own photo via `SIZES`. With a single hardcoded ratio,
+`object-fit: cover` would crop about a third off the wide ones.
+
+If you ever get higher-resolution renders, set `MAX_UPSCALE = 1` and drop `SHARPEN_PERCENT`
+toward 0 — sharp input doesn't want any of this.
 
 The notes live
 in the `HOLES` array near the top of the template's `<script>`; everything below the
@@ -78,8 +92,9 @@ PHOTOS banner is machine-written. Fields match the White book's `HOLES` — `par
 tee really is called "Red" on the Red Course; that's the card's naming, not a typo.)
 
 Per-hole par, stroke index and yardages are transcribed from the Red scorecard PDF and
-cross-checked against every printed subtotal: OUT for all three tee sets (3,547 / 3,264 /
-2,503), par 36, and stroke indexes 2–18 even each appearing once. All five checks pass, and
+cross-checked against every printed subtotal: OUT (3,547 / 3,264 / 2,503), IN (3,447 / 2,988 /
+2,335), TOT (6,994 / 6,252 / 4,838), the alternate Blue set (3,350 IN / 6,897 TOT), par
+36 / 35 / 71, and stroke indexes 1–18 each appearing exactly once. All twelve checks pass, and
 the test asserts them against the rendered DOM rather than the source array.
 
 ### Distances move with the tee
@@ -103,8 +118,8 @@ it is anchored to something other than the tee box:
 | "15 yards lower than the tee" (6) | elevation |
 | "20 ft hill" (7) | elevation |
 
-So hole 5 shows identical numbers from all three tees, which is correct — it's a par 3 whose
-note is written against the green.
+So holes 5, 11 and 16 show identical numbers from all three tees, which is correct — they're
+par 3s whose notes are written against the green.
 
 The shift assumes the tee boxes sit back along the same line. That's the usual case but it
 isn't a survey: on a dogleg where the back tee is offset, or where the card's yardage follows
@@ -112,14 +127,14 @@ a bend the tee shot doesn't, the derived carry will be a yard or three off. Trea
 gospel and the others as a good working estimate — which is what the dotted underline is
 there to say.
 
-Worth knowing if you ever extend this to the back nine: the Red card's **Blue tee has two
-configurations**, 6,994 and 6,897 yards, differing only on holes **13 (496/480), 17 (454/410)
-and 18 (447/410)** — 97 yards across the three. The front nine is identical in both, so the
-caddy is unaffected. The site quotes 6,994, which is the longer one.
+The Red card's **Blue tee has two configurations**, 6,994 and 6,897 yards, differing only on
+holes **13 (496/480), 17 (454/410) and 18 (447/410)** — 97 yards across the three. Those cards
+show both numbers, the smaller one below. The longer set is the one the site quotes and the one
+the NGA rated, so it is also the one the carry adjustment measures from.
 
 Only the current hole and the one either side of it hold a decoded photo at a time; the rest
-have their `src` dropped. At 2674x1654 each decoded frame is ~18 MB, so this matters — nine
-at once would be ~160 MB.
+have their `src` dropped. At around 2600x1600 each decoded frame is ~17 MB, so this matters —
+eighteen at once would be over 300 MB.
 
 ### The White Course book
 

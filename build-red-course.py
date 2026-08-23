@@ -22,7 +22,7 @@ IMAGES = ROOT / "Course Images" / "Red"
 TEMPLATE = ROOT / "red-course.template.html"
 OUTPUT = ROOT / "red-course.html"
 
-HOLES = range(1, 10)
+HOLES = range(1, 19)
 
 # The source renders are only 1337x827 and soft, and there are no
 # higher-resolution originals to go back to. Two things follow.
@@ -38,30 +38,41 @@ HOLES = range(1, 10)
 # Quality 78 rather than 86: an upscaled image is smooth, so JPEG has an
 # easy job. At 2x the two are indistinguishable at 1:1 and q78 saves
 # 1.3 MB across the nine holes.
-UPSCALE = 2
+# The back-nine sources run smaller than the front nine (861 to 1337 px
+# wide), so a flat multiplier would leave those holes softer than the
+# rest. Normalising to a target width instead keeps every card looking
+# the same. MAX_UPSCALE caps it, because past about 2.5x Lanczos has
+# nothing left to work with and the extra pixels are pure file size.
+TARGET_WIDTH = 2600
+MAX_UPSCALE = 2.5
 QUALITY = 78
 
-SHARPEN_RADIUS = 2.2
+# Scaled with the upscale factor: a fixed radius over-sharpens a 3x
+# blow-up and under-sharpens a 1.5x one. Hole 14 carries a hand-drawn
+# red arrow, and too much of this rings around its hard edges.
+SHARPEN_RADIUS_PER_X = 1.1
 SHARPEN_PERCENT = 110
 SHARPEN_THRESHOLD = 2
 
 
-def encode(path: Path) -> str:
+def encode(path: Path):
+    """Returns (base64 jpeg, displayed width, displayed height)."""
     img = Image.open(path).convert("RGB")
-    if UPSCALE != 1:
+    factor = min(TARGET_WIDTH / img.width, MAX_UPSCALE)
+    if factor > 1.01:
         img = img.resize(
-            (round(img.width * UPSCALE), round(img.height * UPSCALE)),
+            (round(img.width * factor), round(img.height * factor)),
             Image.LANCZOS,
         )
-    if SHARPEN_PERCENT:
-        img = img.filter(ImageFilter.UnsharpMask(
-            radius=SHARPEN_RADIUS,
-            percent=SHARPEN_PERCENT,
-            threshold=SHARPEN_THRESHOLD,
-        ))
+        if SHARPEN_PERCENT:
+            img = img.filter(ImageFilter.UnsharpMask(
+                radius=SHARPEN_RADIUS_PER_X * factor,
+                percent=SHARPEN_PERCENT,
+                threshold=SHARPEN_THRESHOLD,
+            ))
     buf = io.BytesIO()
     img.save(buf, "JPEG", quality=QUALITY, optimize=True, progressive=True)
-    return base64.b64encode(buf.getvalue()).decode("ascii")
+    return base64.b64encode(buf.getvalue()).decode("ascii"), img.width, img.height
 
 
 def main() -> int:
@@ -69,25 +80,32 @@ def main() -> int:
         print(f"missing template: {TEMPLATE}", file=sys.stderr)
         return 1
 
-    lines = ["var PHOTOS = {"]
+    photos = ["var PHOTOS = {"]
+    sizes = []
     total = 0
     for n in HOLES:
         src = IMAGES / f"DismalRed_{n}.png"
         if not src.exists():
             print(f"missing image: {src}", file=sys.stderr)
             return 1
-        b64 = encode(src)
+        b64, w, h = encode(src)
         total += len(b64)
-        print(f"  hole {n}: {src.name} -> {len(b64) / 1024:6.0f} KB base64")
-        lines.append(f'    {n}: "data:image/jpeg;base64,{b64}",')
-    lines.append("  };")
+        print(f"  hole {n:>2}: {src.name:<18} -> {w}x{h}  {len(b64) / 1024:6.0f} KB base64")
+        photos.append(f'    {n}: "data:image/jpeg;base64,{b64}",')
+        sizes.append(f"{n}: [{w}, {h}]")
+    photos.append("  };")
 
     html = TEMPLATE.read_text(encoding="utf-8")
-    if "/*__PHOTOS__*/" not in html:
-        print("template has no /*__PHOTOS__*/ marker", file=sys.stderr)
-        return 1
+    for marker in ("/*__PHOTOS__*/", "/*__SIZES__*/"):
+        if marker not in html:
+            print(f"template has no {marker} marker", file=sys.stderr)
+            return 1
 
-    html = html.replace("/*__PHOTOS__*/", "\n".join(lines))
+    # Sizes go near the top, separately from the megabytes of base64, so
+    # the card can set each photo's aspect ratio before it has a src and
+    # nothing jumps around as you swipe.
+    html = html.replace("/*__SIZES__*/", "var SIZES = { " + ", ".join(sizes) + " };")
+    html = html.replace("/*__PHOTOS__*/", "\n".join(photos))
     OUTPUT.write_text(html, encoding="utf-8")
 
     print(f"\nwrote {OUTPUT.name} — {OUTPUT.stat().st_size / 1024 / 1024:.2f} MB "
