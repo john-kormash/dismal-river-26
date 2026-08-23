@@ -121,6 +121,13 @@ it is anchored to something other than the tee box:
 So holes 5, 11 and 16 show identical numbers from all three tees, which is correct — they're
 par 3s whose notes are written against the green.
 
+**When the notes weren't paced from a yardage on the card**, the hole says so. `noteFrom`
+overrides the baseline and `caveat` prints the reason under the tee note. Hole 15 is the one
+that needs it: the club card has it at 271 off White, GS Pro plays it 318, and the notes were
+paced in GS Pro. Its badge reads `−47 yds from 318` rather than naming a tee, and every tee on
+that hole shifts from 318 instead of 271. Add the same two fields to any other hole where GS
+Pro and the card disagree.
+
 The shift assumes the tee boxes sit back along the same line. That's the usual case but it
 isn't a survey: on a dogleg where the back tee is offset, or where the card's yardage follows
 a bend the tee shot doesn't, the derived carry will be a yard or three off. Treat White as

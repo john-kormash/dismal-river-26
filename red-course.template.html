@@ -423,6 +423,17 @@
   }
   .blk h2 .from[hidden]{display:none}
 
+  /* When a hole's notes were paced against a yardage that isn't on the
+     card, say so on the card rather than quietly reconciling it. */
+  .blk .caveat{
+    margin-top:10px;
+    padding-top:9px;
+    border-top:1px dashed var(--line-2);
+    font-size:12.5px;
+    line-height:1.4;
+    color:var(--muted);
+  }
+
   /* ---------- green block ---------- */
   .green-row{display:flex;gap:14px;align-items:flex-start}
   .green-text{min-width:0;flex:1}
@@ -923,6 +934,11 @@
       n: 15,
       par: 4, hcp: 17,
       y: { blue: 315, white: 271, red: 220 },
+      // The club card has this at 271 off White; GS Pro, where these
+      // notes were paced, plays it 318. The carries below are written
+      // against 318, so that is what they get shifted from.
+      noteFrom: 318,
+      caveat: "Scorecard has this hole at 271 off White. GS Pro plays it 318, and these carries are paced from 318.",
       tee: "Aim right of the green, {230}–{250}. Traps and funnels start around {260}.",
       app: "Don't be left. Some room on the right.",
       grn: "Mostly right to left. Big green with a lot of movement on the front half.",
@@ -1074,7 +1090,8 @@
           "</div>" +
           (keys ? '<div class="chips">' + keys + "</div>" : "") +
           block("tee", 'Off the tee<span class="from" hidden></span>', hole.tee,
-                "<p>" + renderNums(hole.tee, 0) + "</p>") +
+                "<p>" + renderNums(hole.tee, 0) + "</p>" +
+                (hole.caveat ? '<p class="caveat">' + esc(hole.caveat) + "</p>" : "")) +
           block("app", "Approach", hole.app, null,
                 hole.par === 3 ? "Par 3 — the tee shot is the approach."
                                : "No separate approach note — the tee line covers it.") +
@@ -1143,10 +1160,22 @@
     return Array.isArray(y) ? y[0] : y;
   }
 
+  // Normally the notes were paced from the White tee, so White is what
+  // the carries shift from. A hole can override that with noteFrom when
+  // the yardage they were actually paced against isn't on the card —
+  // hole 15 is 271 on the card but 318 in GS Pro.
+  function noteBase(hole) {
+    return hole.noteFrom || yOf(hole, BASE_TEE);
+  }
+
+  function baseLabel(hole) {
+    return hole.noteFrom ? String(hole.noteFrom) : TEE_NAMES[BASE_TEE];
+  }
+
   function paintYardages() {
     pages.forEach(function (page, i) {
       var hole = HOLES[i];
-      var delta = yOf(hole, tee) - yOf(hole, BASE_TEE);
+      var delta = yOf(hole, tee) - noteBase(hole);
 
       Array.prototype.forEach.call(page.querySelectorAll(".teecol"), function (col) {
         var set = col.getAttribute("data-tee");
@@ -1163,7 +1192,7 @@
       var badge = page.querySelector(".blk.tee .from");
       if (badge) {
         badge.textContent = (delta > 0 ? "+" : "−") + Math.abs(delta) +
-                            " yds vs " + TEE_NAMES[BASE_TEE];
+                            " yds from " + baseLabel(hole);
         badge.hidden = !delta;
       }
 
